@@ -14,10 +14,10 @@
       </div>
     </div>
     <div>
-            <h3>The Training Plan</h3>
-            <p>This training plan follows a structure known as the <strong>Bro Split</strong>.</p>
-            <h5><i>Push &rarr; Pull &rarr; Legs &rarr; Repeat</i></h5>
-        </div>
+      <h3>The Training Plan</h3>
+      <p>This training plan follows a structure known as the <strong>Bro Split</strong>.</p>
+      <h5><i>Push &rarr; Pull &rarr; Legs &rarr; Repeat</i></h5>
+    </div>
     <div class="card challenge">
       <h3>🔥 Your Challenge 🔥</h3>
       <p>Complete all the workouts and track your progress along the way!</p>
@@ -27,4 +27,20 @@
   </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+#welocme,
+.challenge,
+.benefits {
+  display: flex;
+  flex-direction: column;
+}
+#welcome {
+  gap: 1.5rem;
+}
+.benefits {
+  gap: 0.5rem;
+}
+.challenge {
+  gap: 0.25rem;
+}
+</style>
