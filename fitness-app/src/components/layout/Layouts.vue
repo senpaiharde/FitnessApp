@@ -11,11 +11,7 @@
   <footer>
     <small> Created by </small>
     <a href="https://github.com/senpaiharde" target="_blank">
-      <img
-        src="https://avatars.githubusercontent.com/u/66986422?v=4"
-        alt="Logo"
-       
-      />
+      <img src="https://avatars.githubusercontent.com/u/66986422?v=4" alt="Logo" />
       <p>senpaiharde</p>
     </a>
   </footer>
@@ -27,21 +23,20 @@ footer,
 main {
   display: flex;
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 1rem;
 }
-main{
-    flex:1;
-
+main {
+  flex: 1;
 }
 footer {
   flex-direction: column;
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  padding: 3rem 0;
-  padding-bottom: 4rem;
+  padding: 2rem 0;
+  padding-bottom: 3rem;
 }
 footer a {
   display: flex;
@@ -54,13 +49,14 @@ footer a {
   border: 1px solid transparent;
   transition: 200ms;
   text-decoration: none;
+}
 
+footer a:hover {
+  border-color: var(--color-link);
 }
 footer a img {
   aspect-ratio: 1;
   max-width: 30px;
   border-radius: 100%;
-  
-
 }
 </style>
