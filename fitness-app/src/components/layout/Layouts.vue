@@ -13,6 +13,7 @@
     <a href="https://github.com/senpaiharde" target="_blank">
       <img src="https://avatars.githubusercontent.com/u/66986422?v=4" alt="Logo" />
       <p>senpaiharde</p>
+      <i class="fa-brands fa-github"></i>
     </a>
   </footer>
 </template>
