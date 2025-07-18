@@ -4,7 +4,7 @@ import Welcome from './components/pages/Welcome.vue';
 import Dashboard from './components/pages/Dashboard.vue';
 import Workout from './components/pages/Workout.vue';
 
-const selectedDisplay = 2;
+const selectedDisplay = 3;
 </script>
 
 <template>
