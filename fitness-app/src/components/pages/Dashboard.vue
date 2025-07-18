@@ -1,5 +1,6 @@
 <script setup>
 import {gymHealthFacts} from '../../utils/index';
+const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.length)];
 </script>
 
 <template>
