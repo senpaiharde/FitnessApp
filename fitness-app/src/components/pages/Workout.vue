@@ -1,9 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 const selectedWorkout = 4; // Example selected workout
 const { workout, warmup } = workoutProgram[selectedWorkout];
-const selectedExercise = null; // Example selected exercise
+let selectedExercise = ref(null);
 const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No description available';
 </script>
 
@@ -40,7 +41,13 @@ const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No descri
       <div v-for="(exercise, idx) in warmup" :key="idx" class="workout-grid-row">
         <div class="grid-name">
           <p>{{ exercise.name }}</p>
-          <button>
+          <button
+            @click="() => {
+              selectedExercise = exercise;
+            }"
+            
+            
+          >
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </div>
