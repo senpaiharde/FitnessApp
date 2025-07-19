@@ -15,9 +15,9 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
-      <h6 class="grid-name">sets</h6>
-      <h6 class="grid-name">reps</h6>
-      <h6 class="grid-weights">weights</h6>
+      <h6>sets</h6>
+      <h6>reps</h6>
+      <h6>weights</h6>
       <div v-for="(exercise, idx) in warmup" :key="idx" class="workout-grid-row">
         <div class="grid-name">
           <p>{{ exercise.name }}</p>
@@ -32,8 +32,8 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
 
       <div class="workout-grid-line"></div>
       <h4 class="grid-name">Workout</h4>
-      <h6 class="grid-name">sets</h6>
-      <h6 class="grid-name">reps</h6>
+      <h6>sets</h6>
+      <h6>reps</h6>
       <h6 class="grid-weights">weights</h6>
       <div v-for="(exercise, idx) in workout" :key="idx" class="workout-grid-row">
         <div class="grid-name">
@@ -48,7 +48,7 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
       </div>
     </div>
 
-    <div class="card">
+    <div class="card workout-btns">
       <button @click="() => handleChangeDisplay(2)">
         Save & Exit
         <i class="fa-solid fa-save"></i>
@@ -70,24 +70,35 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
 #workout-card {
   gap: 1.5rem;
 }
-.plan-card-header {
+.plan-card-header,
+.workout-btns {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 .workout-grid,
 .workout-grid-row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1rem;
+  align-items: center;
 }
 .workout-grid-row,
 .workout-grid-line {
   grid-column: span 7 / span 7;
 }
-.grid-name{
-    grid-column: span 3 / span 3;
+.workout-grid-line {
+  margin: 0.5rem 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--background-muted);
+}
+.grid-name {
+  grid-column: span 3 / span 3;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 .grid-weights {
   grid-column: span 2 / span 2;
@@ -96,7 +107,6 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
   padding: 0;
   border: none;
   box-shadow: none;
-
 }
 .grid-name button:hover {
   transform: none;
@@ -105,11 +115,19 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
 }
 .workout-grid-row .grid-name button {
   opacity: 0;
-    pointer-events: none;
-    
+  pointer-events: none;
 }
 .workout-grid-row:hover .grid-name button {
   opacity: 1;
-    pointer-events: all;
+  pointer-events: all;
+}
+.grid-name p {
+  text-transform: capitalize;
+}
+.workout-btns button {
+  flex: 1;
+}
+.workout-btns button i {
+  padding-left: 0.5rem;
 }
 </style>
