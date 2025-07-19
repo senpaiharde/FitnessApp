@@ -92,4 +92,24 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
 .grid-weights {
   grid-column: span 2 / span 2;
 }
+.grid-name button {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+
+}
+.grid-name button:hover {
+  transform: none;
+  box-shadow: none;
+  color: var(--color-link);
+}
+.workout-grid-row .grid-name button {
+  opacity: 0;
+    pointer-events: none;
+    
+}
+.workout-grid-row:hover .grid-name button {
+  opacity: 1;
+    pointer-events: all;
+}
 </style>
