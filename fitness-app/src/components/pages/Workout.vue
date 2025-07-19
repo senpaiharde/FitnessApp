@@ -2,7 +2,10 @@
 import { computed, ref } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
-const selectedWorkout = 4; // Example selected workout
+const {data, selectedWorkout} = defineProps({
+  data: Object,
+  selectedWorkout: Number,
+});
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
@@ -77,7 +80,7 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
         </div>
         <p>{{ exercise.sets }}</p>
         <p>{{ exercise.reps }}</p>
-        <input class="grid-weights" type="text" placeholder="23Kg" />
+        <input v-model="data[selectedWorkout[w.name]]" class="grid-weights" type="text" placeholder="23Kg" />
       </div>
     </div>
 
