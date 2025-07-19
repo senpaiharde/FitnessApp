@@ -13,7 +13,7 @@ for (let workoutIdx in workoutProgram) {
     defaultData[workoutIdx][e.name] = '';
   }
 }
-const selectedDisplay = ref(2);
+const selectedDisplay = ref(1);
 const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
@@ -32,12 +32,16 @@ function handleSelectWorkout(idx) {
 
 function handleSaveWorkout() {
     localStorage.setItem('workoutData', JSON.stringify(data.value));
+
+    selectedDisplay.value = 2; // Switch back to Dashboard display
+
+    selectedWorkout.value = -1; // Reset selected workout
 }
 </script>
 
 <template>
   <Layouts>
-    <Welcome v-if="selectedDisplay == 1" />
+    <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
     <Dashboard v-if="selectedDisplay == 2" />
     <!-- The Dashboard component will be displayed after the Welcome component -->

@@ -1,4 +1,9 @@
-<script setup></script>
+<script setup>
+const { handleChangeDisplay } = defineProps({
+  handleChangeDisplay: Function,
+});
+
+</script>
 
 <template>
   <section id="welcome" class="welcome-section">
