@@ -29,21 +29,67 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
         <p>{{ exercise.reps }}</p>
         <input class="grid-weights" type="text" placeholder="23Kg" disabled />
       </div>
+
+      <div class="workout-grid-line"></div>
+      <h4 class="grid-name">Workout</h4>
+      <h6 class="grid-name">sets</h6>
+      <h6 class="grid-name">reps</h6>
+      <h6 class="grid-weights">weights</h6>
       <div v-for="(exercise, idx) in workout" :key="idx" class="workout-grid-row">
         <div class="grid-name">
           <p>{{ exercise.name }}</p>
           <button>
             <i class="fa-regular fa-circle-question"></i>
           </button>
-          <p>{{ exercise.sets }}</p>
-          <p>{{ exercise.reps }}</p>
-          <input class="grid-weights" type="text" placeholder="23Kg"  />
         </div>
+        <p>{{ exercise.sets }}</p>
+        <p>{{ exercise.reps }}</p>
+        <input class="grid-weights" type="text" placeholder="23Kg" />
       </div>
     </div>
 
-    <button @click="() => handleChangeDisplay(2)">Back to Dashboard &larr;</button>
+    <div class="card">
+      <button @click="() => handleChangeDisplay(2)">
+        Save & Exit
+        <i class="fa-solid fa-save"></i>
+      </button>
+      <button @click="() => handleChangeDisplay(2)">
+        Complete
+        <i class="fa-solid fa-check"></i>
+      </button>
+    </div>
   </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+#workout-card,
+.plan-card {
+  display: flex;
+  flex-direction: column;
+}
+#workout-card {
+  gap: 1.5rem;
+}
+.plan-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.workout-grid,
+.workout-grid-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1rem;
+}
+.workout-grid-row,
+.workout-grid-line {
+  grid-column: span 7 / span 7;
+}
+.grid-name{
+    grid-column: span 3 / span 3;
+}
+.grid-weights {
+  grid-column: span 2 / span 2;
+}
+</style>
