@@ -1,5 +1,17 @@
-<script setup></script>
+<script setup>
+import { Teleport } from 'vue';
 
-<template>23</template>
+
+</script>
+
+<template>
+
+<Teleport to="#portal">
+  <div class="portal">
+    <slot />
+  </div>
+</Teleport>
+<section></section>
+</template>
 
 <style scoped></style>
