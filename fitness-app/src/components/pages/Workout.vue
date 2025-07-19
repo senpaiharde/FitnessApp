@@ -5,7 +5,7 @@ import Portal from '../Portal.vue';
 const {data, selectedWorkout} = defineProps({
   data: Object,
   selectedWorkout: Number,
-    isCompleteCheck: Boolean,
+    isWorkoutComplete: Boolean,
     handleSaveWorkout: Function,
 });
 const { workout, warmup } = workoutProgram[selectedWorkout];
@@ -83,7 +83,7 @@ const day = selectedWorkout + 1
         </div>
         <p>{{ exercise.sets }}</p>
         <p>{{ exercise.reps }}</p>
-        <input v-model="data[selectedWorkout[exercise.name]]" class="grid-weights" type="text" placeholder="23Kg" />
+        <input v-model="data[selectedWorkout][exercise.name]" class="grid-weights" type="text" placeholder="23Kg" />
       </div>
     </div>
 
@@ -92,7 +92,7 @@ const day = selectedWorkout + 1
         Save & Exit
         <i class="fa-solid fa-save"></i>
       </button>
-      <button :disabled="isWorkoutCompleted" @click="handleSaveWorkout">
+      <button :disabled="!isWorkoutCompleted" @click="handleSaveWorkout">
         Complete
         <i class="fa-solid fa-check"></i>
       </button>

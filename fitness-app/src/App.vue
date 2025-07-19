@@ -17,22 +17,29 @@ const selectedDisplay = ref(1);
 const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
-
 const isWorkoutCompleted = computed(() => {
-    const currWorkout = data.value?.[selectedWorkout.value];
-   if(!currWorkout) return false;
+  const currWorkout = data.value?.[selectedWorkout.value];
+  if (!currWorkout) return false;
 
-   const isCompleteCheck = Object.values(currWorkout).every(value => value !== '');
-   console.log('ISCOMPLETE CHECK:', isCompleteCheck);
-    return isCompleteCheck;
+  const isCompleteCheck = Object.values(currWorkout).every(ex => !!ex);
+  console.log('ISCOMPLETE CHECK:', isCompleteCheck);
+  return isCompleteCheck;
 });
 
 const firstInCompletedWorkoutIndex = computed(() => {
-    if (!data.value || Object.keys(data.value).length === 0) return -1;
-  const completedWorkouts = Object.entries(data.value).filter(([_, workout]) => {
-    return Object.values(workout).every(value => value !== '');
-  });
-  return completedWorkouts.length > 0 ? completedWorkouts[0][0] : null;
+  const allWorkouts = data.value;
+  if (!allWorkouts) {
+    return -1;
+  }
+
+  // loop over every key value pair, and check if the workout is complete or not
+  for (const [index, workout] of Object.entries(allWorkouts)) {
+    const isComplete = Object.values(workout).every(ex => !!ex);
+    if (!isComplete) {
+      return parseInt(index);
+    }
+  }
+  return -1; // all are complete
 });
 
 function handleChangeDisplay(idx) {
@@ -58,13 +65,15 @@ function handleSaveWorkout() {
   <Layouts>
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
-    <Dashboard 
-    :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
-    :handleSelectWorkout="handleSelectWorkout" v-if="selectedDisplay == 2" />
+    <Dashboard
+      :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
+      :handleSelectWorkout="handleSelectWorkout"
+      v-if="selectedDisplay == 2"
+    />
     <!-- The Dashboard component will be displayed after the Welcome component -->
-    <Workout 
-       :isWorkoutCompleted="isWorkoutCompleted"
-       :handleSaveWorkout="handleSaveWorkout"
+    <Workout
+      :isWorkoutCompleted="isWorkoutCompleted"
+      :handleSaveWorkout="handleSaveWorkout"
       :data="data"
       :selectedWorkout="selectedWorkout"
       v-if="workoutProgram?.[selectedWorkout]"
