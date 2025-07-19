@@ -6,7 +6,7 @@ const { workout, warmup } = workoutProgram[selectedWorkout];
 </script>
 
 <template>
-    <Portal> </Portal>
+  <Portal> <h4> PUSHUPS   </h4> </Portal>
   <section id="workout-card">
     <div class="plan-card card">
       <div class="plan-card-header">
