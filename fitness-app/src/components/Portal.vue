@@ -5,7 +5,7 @@ import { Teleport } from 'vue';
 <template>
   <Teleport to="#portal">
     <div class="portal-container">
-      <div role="button" tabindex="0" class="portal-underlay" @click="$emit('close')">x</div>
+      <div role="button" tabindex="0" class="portal-underlay" ></div>
 
       <div class="portal-content">
         <slot></slot>

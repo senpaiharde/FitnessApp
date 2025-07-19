@@ -3,15 +3,14 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 const selectedWorkout = 4; // Example selected workout
 const { workout, warmup } = workoutProgram[selectedWorkout];
-const selectedExercise = workout[3]; // Example selected exercise
-const exerciseDescription =
-  exerciseDescriptions[selectedExercise.name] || 'No description available';
+const selectedExercise = null; // Example selected exercise
+const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No description available';
 </script>
 
 <template>
-  <Portal>
+  <Portal v-if="selectedExercise" @close="$emit('close')">
     <div class="exercise-description">
-      <h4>{{ selectedExercise.name }}</h4>
+      <h3>{{ selectedExercise.name }}</h3>
 
       <div class="exercise-image">
         <small>Description</small>
@@ -154,5 +153,8 @@ const exerciseDescription =
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+.exercise-description button i {
+  padding-left: 0.5rem;
 }
 </style>
