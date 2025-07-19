@@ -11,7 +11,7 @@ console.log('Grid component loaded', handleSelectWorkout);
 <template>
   <section id="grid">
     <button
-      
+      disabled=""
       :key="workoutIdx"
       v-for="(workout, workoutIdx) in Object.keys(workoutProgram)"
       class="card-button plan-card"
@@ -41,6 +41,10 @@ console.log('Grid component loaded', handleSelectWorkout);
 }
 #grid button {
   width: 100%;
+}
+#grid button:disabled {
+ box-shadow: none;
+ cursor: not-allowed;
 }
 .plan-card {
   display: flex;

@@ -17,6 +17,13 @@ const selectedDisplay = ref(1);
 const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
+
+const isWorkoutSelected = computed(() => {
+    const currWorkout = data.value?.[selectedWorkout.value];
+   if(!currWorkout) return false;
+
+   const isCompleteCheck = Object.values(currWorkout).every(value => value !== '');
+});
 function handleChangeDisplay(idx) {
   selectedDisplay.value = idx;
 }
