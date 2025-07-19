@@ -6,10 +6,11 @@ const selectedWorkout = 4; // Example selected workout
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
+
 </script>
 
 <template>
-  <Portal v-if="selectedExercise" @close="$emit('close')">
+  <Portal :onClose="() => (selectedExercise   = null  )" v-if="selectedExercise" >
     <div class="exercise-description">
       <h3>{{ selectedExercise }}</h3>
 
@@ -67,7 +68,6 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
           <button
             @click="
               () => {
-                console.log(exercise.name, 'hello');
                 selectedExercise = exercise.name;
               }
             "

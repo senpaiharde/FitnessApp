@@ -1,11 +1,16 @@
 <script setup>
 import { Teleport } from 'vue';
+const props = defineProps({
+  onClose: Function
+});
+
+console.log('Portal component loaded', props.onClose);
 </script>
 
 <template>
   <Teleport to="#portal">
     <div class="portal-container">
-      <div role="button" tabindex="0" class="portal-underlay" ></div>
+      <div role="button" tabindex="0" class="portal-underlay" @click="props.onClose"></div>
 
       <div class="portal-content">
         <slot></slot>
