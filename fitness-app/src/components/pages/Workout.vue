@@ -1,17 +1,17 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 const selectedWorkout = 4; // Example selected workout
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
-const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No description available';
+const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 </script>
 
 <template>
   <Portal v-if="selectedExercise" @close="$emit('close')">
     <div class="exercise-description">
-      <h3>{{ selectedExercise.name }}</h3>
+      <h3>{{ selectedExercise }}</h3>
 
       <div class="exercise-image">
         <small>Description</small>
@@ -19,7 +19,7 @@ const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No descri
           {{ exerciseDescription || 'No description available for this exercise.' }}
         </p>
       </div>
-      <button @click="$emit('close')">
+      <button @click="() => (selectedExercise = null)">
         Close
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -42,11 +42,11 @@ const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No descri
         <div class="grid-name">
           <p>{{ exercise.name }}</p>
           <button
-            @click="() => {
-              selectedExercise = exercise;
-            }"
-            
-            
+            @click="
+              () => {
+                selectedExercise = exercise.name;
+              }
+            "
           >
             <i class="fa-regular fa-circle-question"></i>
           </button>
@@ -64,7 +64,14 @@ const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No descri
       <div v-for="(exercise, idx) in workout" :key="idx" class="workout-grid-row">
         <div class="grid-name">
           <p>{{ exercise.name }}</p>
-          <button>
+          <button
+            @click="
+              () => {
+                console.log(exercise.name, 'hello');
+                selectedExercise = exercise.name;
+              }
+            "
+          >
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </div>
@@ -160,6 +167,10 @@ const exerciseDescription = exerciseDescriptions[selectedExercise] || 'No descri
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+}
+.exercise-description h3 {
+  text-transform: capitalize;
 }
 .exercise-description button i {
   padding-left: 0.5rem;
