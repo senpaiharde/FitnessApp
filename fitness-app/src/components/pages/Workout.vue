@@ -9,11 +9,12 @@ const {data, selectedWorkout} = defineProps({
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
-
+console.log('Workout component loaded', selectedWorkout, workout, warmup, exerciseDescription);
+const day = selectedWorkout + 1
 </script>
 
 <template>
-  <Portal :onClose="() => (selectedExercise   = null  )" v-if="selectedExercise" >
+  <Portal :onClose="() => (selectedExercise  = null  )" v-if="selectedExercise" >
     <div class="exercise-description">
       <h3>{{ selectedExercise }}</h3>
 
@@ -32,7 +33,7 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
   <section id="workout-card">
     <div class="plan-card card">
       <div class="plan-card-header">
-        <p>Day {{ selectedWorkout < 9 ? '0' + selectedWorkout : selectedWorkout }}</p>
+        <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <i class="fa-solid fa-dumbbell"></i>
       </div>
       <h2>{{}}</h2>
@@ -80,7 +81,7 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
         </div>
         <p>{{ exercise.sets }}</p>
         <p>{{ exercise.reps }}</p>
-        <input v-model="data[selectedWorkout[w.name]]" class="grid-weights" type="text" placeholder="23Kg" />
+        <input v-model="data[selectedWorkout[exercise.name]]" class="grid-weights" type="text" placeholder="23Kg" />
       </div>
     </div>
 

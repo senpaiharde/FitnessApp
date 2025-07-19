@@ -1,6 +1,12 @@
 <script setup>
 import { gymHealthFacts } from '../../utils/index';
 import Grid from '../Grid.vue';
+
+const props = defineProps({
+  handleSelectWorkout: Function,
+});
+console.log('Dashboard component loaded', props);
+
 const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.length)];
 </script>
 
@@ -16,7 +22,7 @@ const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.leng
       </div>
       <button @click="() => handleChangeDisplay(3)">Start Workout &rarr;</button>
     </div>
-    <Grid />
+    <Grid v-bind="props" />
   </section>
 </template>
 

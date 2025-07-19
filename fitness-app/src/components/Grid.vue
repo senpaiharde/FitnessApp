@@ -1,14 +1,26 @@
 <script setup>
 import { workoutProgram } from '../utils';
 const workoutTypes = ['push', 'pull', 'legs'];
+
+const {handleSelectWorkout } = defineProps({
+  handleSelectWorkout: Function,
+});
+console.log('Grid component loaded', handleSelectWorkout);
 </script>
 
 <template>
   <section id="grid">
     <button
+      
       :key="workoutIdx"
       v-for="(workout, workoutIdx) in Object.keys(workoutProgram)"
       class="card-button plan-card"
+      @click="
+        () => (
+          console.log('Workout selected:', workoutIdx, handleSelectWorkout(workoutIdx),selectedWorkout),
+          handleSelectWorkout(workoutIdx)
+        )
+      "
     >
       <div class="card">
         <p class="card-title">{{ workout < 9 ? '0' + (workoutIdx + 1) : workoutIdx + 1 }}</p>

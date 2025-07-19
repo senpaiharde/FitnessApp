@@ -17,25 +17,22 @@ const selectedDisplay = ref(1);
 const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
-
 function handleChangeDisplay(idx) {
-    selectedDisplay.value = idx;
-    
+  selectedDisplay.value = idx;
 }
 
 function handleSelectWorkout(idx) {
-    selectedWorkout.value = idx;
-    selectedDisplay.value = 3; // Switch to Workout display
-    
+  selectedDisplay.value = 3; // Switch to Workout display
+  selectedWorkout.value = idx;
+  console.log('Selected workout:', idx);
 }
 
-
 function handleSaveWorkout() {
-    localStorage.setItem('workoutData', JSON.stringify(data.value));
+  localStorage.setItem('workoutData', JSON.stringify(data.value));
 
-    selectedDisplay.value = 2; // Switch back to Dashboard display
+  selectedDisplay.value = 2; // Switch back to Dashboard display
 
-    selectedWorkout.value = -1; // Reset selected workout
+  selectedWorkout.value = -1; // Reset selected workout
 }
 </script>
 
@@ -43,9 +40,9 @@ function handleSaveWorkout() {
   <Layouts>
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
-    <Dashboard v-if="selectedDisplay == 2" />
+    <Dashboard :handleSelectWorkout="handleSelectWorkout" v-if="selectedDisplay == 2" />
     <!-- The Dashboard component will be displayed after the Welcome component -->
-    <Workout
+    <Workout 
       :data="data"
       :selectedWorkout="selectedWorkout"
       v-if="workoutProgram?.[selectedWorkout]"
