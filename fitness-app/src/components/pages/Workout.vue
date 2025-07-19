@@ -5,6 +5,8 @@ import Portal from '../Portal.vue';
 const {data, selectedWorkout} = defineProps({
   data: Object,
   selectedWorkout: Number,
+    isCompleteCheck: Boolean,
+    handleSaveWorkout: Function,
 });
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
@@ -86,11 +88,11 @@ const day = selectedWorkout + 1
     </div>
 
     <div class="card workout-btns">
-      <button @click="() => handleChangeDisplay(2)">
+      <button @click="handleSaveWorkout">
         Save & Exit
         <i class="fa-solid fa-save"></i>
       </button>
-      <button @click="() => handleChangeDisplay(2)">
+      <button :disabled="isWorkoutCompleted" @click="handleSaveWorkout">
         Complete
         <i class="fa-solid fa-check"></i>
       </button>

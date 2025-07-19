@@ -4,6 +4,7 @@ const workoutTypes = ['push', 'pull', 'legs'];
 
 const {handleSelectWorkout } = defineProps({
   handleSelectWorkout: Function,
+  firstInCompletedWorkoutIndex: Number,
 });
 console.log('Grid component loaded', handleSelectWorkout);
 </script>

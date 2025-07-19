@@ -4,6 +4,7 @@ import Grid from '../Grid.vue';
 
 const props = defineProps({
   handleSelectWorkout: Function,
+  firstInCompletedWorkoutIndex: Number,
 });
 console.log('Dashboard component loaded', props);
 
@@ -20,7 +21,7 @@ const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.leng
           {{ randomFact }}
         </p>
       </div>
-      <button @click="() => handleChangeDisplay(3)">Start Workout &rarr;</button>
+      <button @click="() => handleSelectWorkout(firstInCompletedWorkoutIndex < 0 ? 0 : firstInCompletedWorkoutIndex)">Start Workout &rarr;</button>
     </div>
     <Grid v-bind="props" />
   </section>

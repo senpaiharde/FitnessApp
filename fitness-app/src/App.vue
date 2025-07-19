@@ -18,12 +18,23 @@ const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
 
-const isWorkoutSelected = computed(() => {
+const isWorkoutCompleted = computed(() => {
     const currWorkout = data.value?.[selectedWorkout.value];
    if(!currWorkout) return false;
 
    const isCompleteCheck = Object.values(currWorkout).every(value => value !== '');
+   console.log('ISCOMPLETE CHECK:', isCompleteCheck);
+    return isCompleteCheck;
 });
+
+const firstInCompletedWorkoutIndex = computed(() => {
+    if (!data.value || Object.keys(data.value).length === 0) return -1;
+  const completedWorkouts = Object.entries(data.value).filter(([_, workout]) => {
+    return Object.values(workout).every(value => value !== '');
+  });
+  return completedWorkouts.length > 0 ? completedWorkouts[0][0] : null;
+});
+
 function handleChangeDisplay(idx) {
   selectedDisplay.value = idx;
 }
@@ -47,9 +58,13 @@ function handleSaveWorkout() {
   <Layouts>
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
-    <Dashboard :handleSelectWorkout="handleSelectWorkout" v-if="selectedDisplay == 2" />
+    <Dashboard 
+    :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
+    :handleSelectWorkout="handleSelectWorkout" v-if="selectedDisplay == 2" />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout 
+       :isWorkoutCompleted="isWorkoutCompleted"
+       :handleSaveWorkout="handleSaveWorkout"
       :data="data"
       :selectedWorkout="selectedWorkout"
       v-if="workoutProgram?.[selectedWorkout]"
