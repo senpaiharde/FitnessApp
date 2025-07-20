@@ -17,10 +17,12 @@ const selectedDisplay = ref(1);
 const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
-const isWorkoutCompleted = computed(() => {
-  const currWorkout = data.value?.[selectedWorkout.value];
-  if (!currWorkout) return false;
+ const isWorkoutComplete = computed(() => {
+    const currWorkout = data.value?.[selectedWorkout.value]
+    if (!currWorkout) { return false } // guard clause to exit function
 
+
+    
   const isCompleteCheck = Object.values(currWorkout).every(ex => !!ex);
   console.log('ISCOMPLETE CHECK:', isCompleteCheck);
   return isCompleteCheck;
@@ -72,7 +74,7 @@ function handleSaveWorkout() {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
-      :isWorkoutCompleted="isWorkoutCompleted"
+      :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
       :data="data"
       :selectedWorkout="selectedWorkout"

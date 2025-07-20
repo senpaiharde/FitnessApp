@@ -2,21 +2,23 @@
 import { computed, ref } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
-const {data, selectedWorkout} = defineProps({
+const { data, selectedWorkout, isWorkoutComplete } = defineProps({
   data: Object,
   selectedWorkout: Number,
-    isWorkoutComplete: Boolean,
-    handleSaveWorkout: Function,
+  isWorkoutComplete: Boolean,
+  handleSaveWorkout: Function,
 });
+const workoutTypes = ['push', 'pull', 'legs'];
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 console.log('Workout component loaded', selectedWorkout, workout, warmup, exerciseDescription);
-const day = selectedWorkout + 1
+const day = selectedWorkout + 1;
+console.log('Selected workout day:', isWorkoutComplete);
 </script>
 
 <template>
-  <Portal :onClose="() => (selectedExercise  = null  )" v-if="selectedExercise" >
+  <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
     <div class="exercise-description">
       <h3>{{ selectedExercise }}</h3>
 
@@ -64,7 +66,7 @@ const day = selectedWorkout + 1
       </div>
 
       <div class="workout-grid-line"></div>
-      <h4 class="grid-name">Workout</h4>
+      <h4 class="grid-name">{{ workoutTypes[selectedWorkout % 3] }}Workout</h4>
       <h6>sets</h6>
       <h6>reps</h6>
       <h6 class="grid-weights">weights</h6>
@@ -83,7 +85,12 @@ const day = selectedWorkout + 1
         </div>
         <p>{{ exercise.sets }}</p>
         <p>{{ exercise.reps }}</p>
-        <input v-model="data[selectedWorkout][exercise.name]" class="grid-weights" type="text" placeholder="23Kg" />
+        <input
+          v-model="data[selectedWorkout][exercise.name]"
+          class="grid-weights"
+          type="text"
+          placeholder="23Kg"
+        />
       </div>
     </div>
 
@@ -92,7 +99,7 @@ const day = selectedWorkout + 1
         Save & Exit
         <i class="fa-solid fa-save"></i>
       </button>
-      <button :disabled="!isWorkoutCompleted" @click="handleSaveWorkout">
+      <button :disabled="!isWorkoutComplete" @click="handleSaveWorkout">
         Complete
         <i class="fa-solid fa-check"></i>
       </button>
