@@ -6,13 +6,13 @@ const {handleSelectWorkout } = defineProps({
   handleSelectWorkout: Function,
   firstInCompletedWorkoutIndex: Number,
 });
-console.log('Grid component loaded', handleSelectWorkout);
+
 </script>
 
 <template>
   <section id="grid">
     <button
-      disabled=""
+      :disabled="workoutIdx > 0 && workoutIdx > firstInCompletedWorkoutIndex"
       :key="workoutIdx"
       v-for="(workout, workoutIdx) in Object.keys(workoutProgram)"
       class="card-button plan-card"
@@ -31,6 +31,12 @@ console.log('Grid component loaded', handleSelectWorkout);
       </div>
       <h3>{{ workoutTypes[workoutIdx % 3] }}</h3>
     </button>
+    <button class="card-button plan-card-reset" @click="handleSelectWorkout(-1)">
+      <div class="card">
+        <p class="card-title">Rest</p>
+        <i class="fa-solid fa-rotate-left"></i>
+      </div>
+      <h3>Add Workout</h3>
   </section>
 </template>
 
@@ -47,9 +53,15 @@ console.log('Grid component loaded', handleSelectWorkout);
  box-shadow: none;
  cursor: not-allowed;
 }
-.plan-card {
+.plan-card,
+.plan-card-reset {
   display: flex;
   flex-direction: column;
+}
+.plan-card-reset {
+ align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 .plan-card div {
   display: flex;

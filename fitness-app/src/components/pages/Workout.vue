@@ -40,7 +40,7 @@ console.log('Selected workout day:', isWorkoutComplete);
         <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <i class="fa-solid fa-dumbbell"></i>
       </div>
-      <h2>{{}}</h2>
+      <h2>{{ workoutTypes[selectedWorkout % 3] }}  Workout</h2>
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
@@ -66,7 +66,7 @@ console.log('Selected workout day:', isWorkoutComplete);
       </div>
 
       <div class="workout-grid-line"></div>
-      <h4 class="grid-name">{{ workoutTypes[selectedWorkout % 3] }}Workout</h4>
+      <h4 class="grid-name">Workout</h4>
       <h6>sets</h6>
       <h6>reps</h6>
       <h6 class="grid-weights">weights</h6>

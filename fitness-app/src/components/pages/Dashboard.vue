@@ -23,7 +23,7 @@ const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.leng
       </div>
       <button @click="() => handleSelectWorkout(firstInCompletedWorkoutIndex < 0 ? 0 : firstInCompletedWorkoutIndex)">Start Workout &rarr;</button>
     </div>
-    <Grid v-bind="props" />
+    <Grid  v-bind="props" />
   </section>
 </template>
 
