@@ -22,7 +22,7 @@ const selectedWorkout = ref(-1); // Example selected workout
     if (!currWorkout) { return false } // guard clause to exit function
 
 
-    
+
   const isCompleteCheck = Object.values(currWorkout).every(ex => !!ex);
   console.log('ISCOMPLETE CHECK:', isCompleteCheck);
   return isCompleteCheck;
@@ -61,6 +61,14 @@ function handleSaveWorkout() {
 
   selectedWorkout.value = -1; // Reset selected workout
 }
+
+function handleRestPlan() {
+    selectedDisplay.value = 2; // Switch back to Dashboard display
+    selectedWorkout.value = -1; // Reset selected workout
+    data.value = defaultData; // Reset all workout data
+    console.log('Rest plan activated, all workouts reset.');
+    localStorage.removeItem('workoutData'); // Clear local storage
+}
 </script>
 
 <template>
@@ -68,12 +76,14 @@ function handleSaveWorkout() {
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
     <Dashboard
+    :handleRestPlan="handleRestPlan"
       :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
       :handleSelectWorkout="handleSelectWorkout"
       v-if="selectedDisplay == 2"
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
+       
       :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
       :data="data"

@@ -2,11 +2,11 @@
 import { workoutProgram } from '../utils';
 const workoutTypes = ['push', 'pull', 'legs'];
 
-const {handleSelectWorkout } = defineProps({
+const { handleSelectWorkout } = defineProps({
   handleSelectWorkout: Function,
   firstInCompletedWorkoutIndex: Number,
+  handleRestPlan : Function,
 });
-
 </script>
 
 <template>
@@ -18,7 +18,12 @@ const {handleSelectWorkout } = defineProps({
       class="card-button plan-card"
       @click="
         () => (
-          console.log('Workout selected:', workoutIdx, handleSelectWorkout(workoutIdx),selectedWorkout),
+          console.log(
+            'Workout selected:',
+            workoutIdx,
+            handleSelectWorkout(workoutIdx),
+            selectedWorkout
+          ),
           handleSelectWorkout(workoutIdx)
         )
       "
@@ -31,50 +36,62 @@ const {handleSelectWorkout } = defineProps({
       </div>
       <h3>{{ workoutTypes[workoutIdx % 3] }}</h3>
     </button>
-    <button class="card-button plan-card-reset" @click="handleSelectWorkout(-1)">
-      <div class="card">
+    <button 
+        :disabled="firstInCompletedWorkoutIndex !== -1"
+        class="card-button plan-card-reset"
+        @click="handleRestPlan"
+    >
+      
         <p class="card-title">Rest</p>
         <i class="fa-solid fa-rotate-left"></i>
-      </div>
-      <h3>Add Workout</h3>
+      
+    </button>
   </section>
 </template>
 
 <style scoped>
 #grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-#grid button {
-  width: 100%;
-}
-#grid button:disabled {
- box-shadow: none;
- cursor: not-allowed;
-}
-.plan-card,
-.plan-card-reset {
-  display: flex;
-  flex-direction: column;
-}
-.plan-card-reset {
- align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-.plan-card div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-.plan-card dev p {
-  text-align: left;
-}
-@media (min-width: 640px) {
-  #grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    #grid button {
+        width: 100%;
+    }
+
+    #grid button:disabled {
+        box-shadow: none;
+        cursor: not-allowed;
+
+    }
+
+    .plan-card{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .plan-card-reset {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .plan-card div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .plan-card div p {
+        text-align: left;
+    }
+
+    @media (min-width: 640px) {
+        #grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
 </style>
