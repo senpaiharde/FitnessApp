@@ -15,6 +15,47 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
 console.log('Workout component loaded', selectedWorkout, workout, warmup, exerciseDescription);
 const day = selectedWorkout + 1;
 console.log('Selected workout day:', isWorkoutComplete);
+
+const time = ref(0)
+const timerId = ref(null)
+let minute = 0
+let hour = 0
+function clearTimer() {
+  if (timerId.value !== null) {
+    clearInterval(timerId.value);
+    timerId.value = null;
+    time.value = 0; // Reset time when clearing the timer
+    minute = 0; // Reset minute
+    hour = 0; // Reset hour
+    console.log('Timer cleared');
+  }
+}
+// 2) start/stop functions
+function startTimer() {
+  // if you already have one running, clear it
+ 
+
+  time.value = time.value || 0 // reset time if needed
+  timerId.value = setInterval(() => {
+    time.value++
+    if(time.value % 60 === 0) {
+      minute ++ // increment minute every 60 seconds
+    }
+    if(time.value % 3600 === 0) {
+      hour ++ // increment hour every 3600 seconds
+    }
+    
+  }, 1000)
+}
+
+function stopTimer() {
+  if (timerId.value !== null) {
+    clearInterval(timerId.value)
+    timerId.value = null
+    console.log('Timer stopped at', time.value, 'seconds')
+  }
+}
+
 </script>
 
 <template>
@@ -23,7 +64,7 @@ console.log('Selected workout day:', isWorkoutComplete);
       <h3>{{ selectedExercise }}</h3>
 
       <div class="exercise-image">
-        <small>Description</small>
+        <small>Description </small>
         <p class="exercise-description">
           {{ exerciseDescription || 'No description available for this exercise.' }}
         </p>
@@ -40,7 +81,12 @@ console.log('Selected workout day:', isWorkoutComplete);
         <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <i class="fa-solid fa-dumbbell"></i>
       </div>
-      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
+      <h2>
+        {{ workoutTypes[selectedWorkout % 3] }} Workout
+        <button @click="startTimer">Start Timer</button>
+        <button @click="stopTimer">step Timer</button>
+        <h2>{{ time }}</h2>
+      </h2>
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>

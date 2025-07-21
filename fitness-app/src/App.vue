@@ -18,7 +18,7 @@ const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
 const isWorkoutComplete = computed(() => {
-  const curr = data.value[selectedWorkout];
+  const curr = data.value[selectedWorkout.value];
   if (!curr) return false;
 
   return Object.values(curr).every(

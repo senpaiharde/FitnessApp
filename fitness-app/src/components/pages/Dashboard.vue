@@ -33,6 +33,7 @@ const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.leng
     .tip-container div,
     #dashboard {
         display: flex;
+        
     }
 
     .tip-container,
@@ -46,6 +47,7 @@ const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.leng
 
     .tip-container {
         gap: 0.5rem;
+        border: 1.5px solid var(--border-secondary);
     }
 
     @media (min-width: 640px) {
