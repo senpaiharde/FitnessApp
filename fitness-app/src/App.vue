@@ -63,7 +63,7 @@ function handleSaveWorkout() {
 }
 
 function handleRestPlan() {
-  selectedDisplay.value = 2; // Switch back to Dashboard display
+  selectedDisplay.value = 1; // Switch back to Dashboard display
   selectedWorkout.value = -1; // Reset selected workout
   data.value = defaultData; // Reset all workout data
   console.log('Rest plan activated, all workouts reset.');

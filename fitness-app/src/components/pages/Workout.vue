@@ -87,9 +87,14 @@ console.log('Selected workout day:', isWorkoutComplete);
           v-model="data[selectedWorkout][exercise.name[0].toLowerCase() + exercise.name.slice(1)]"
           
           type="text"
-          placeholder="3"
+          :placeholder="exercise.sets + ' sets'"
         />
-        <p>{{ exercise.reps }}</p>
+        <input 
+          v-model="data[selectedWorkout][exercise.name[1].toLowerCase() + exercise.name.slice(1)]"
+          
+          type="text"
+          :placeholder="exercise.reps + ' reps'"
+        />
         <input
           v-model="data[selectedWorkout][exercise.name]"
           class="grid-weights"
@@ -175,6 +180,7 @@ console.log('Selected workout day:', isWorkoutComplete);
 .grid-name p {
   text-transform: capitalize;
 }
+
 .workout-btns button {
   flex: 1;
 }

@@ -2,11 +2,12 @@
 import { workoutProgram } from '../utils';
 const workoutTypes = ['push', 'pull', 'legs'];
 
-const { handleSelectWorkout } = defineProps({
+const { handleSelectWorkout,firstInCompletedWorkoutIndex,handleRestPlan } = defineProps({
   handleSelectWorkout: Function,
   firstInCompletedWorkoutIndex: Number,
   handleRestPlan : Function,
 });
+console.log('Grid component loaded',handleRestPlan);
 </script>
 
 <template>
@@ -37,9 +38,13 @@ const { handleSelectWorkout } = defineProps({
       <h3>{{ workoutTypes[workoutIdx % 3] }}</h3>
     </button>
     <button 
-        :disabled="firstInCompletedWorkoutIndex !== -1"
+        :disabled="firstInCompletedWorkoutIndex == -1"
         class="card-button plan-card-reset"
-        @click="handleRestPlan"
+        @click="() => (
+          console.log('Resetting workout plan',handleRestPlan),
+          handleRestPlan()
+        )"
+       
     >
       
         <p class="card-title">Rest</p>

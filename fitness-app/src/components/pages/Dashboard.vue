@@ -5,6 +5,7 @@ import Grid from '../Grid.vue';
 const props = defineProps({
   handleSelectWorkout: Function,
   firstInCompletedWorkoutIndex: Number,
+  handleRestPlan: Function,
 });
 console.log('Dashboard component loaded', props);
 
