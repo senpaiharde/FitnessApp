@@ -83,7 +83,12 @@ console.log('Selected workout day:', isWorkoutComplete);
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </div>
-        <p>{{ exercise.sets }}</p>
+       <input
+          v-model="data[selectedWorkout][exercise.name[0].toLowerCase() + exercise.name.slice(1)]"
+          
+          type="text"
+          placeholder="3"
+        />
         <p>{{ exercise.reps }}</p>
         <input
           v-model="data[selectedWorkout][exercise.name]"
