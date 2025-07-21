@@ -63,20 +63,22 @@ function handleSaveWorkout() {
 }
 
 function handleRestPlan() {
-  selectedDisplay.value = 1; // Switch back to Dashboard display
-  selectedWorkout.value = -1; // Reset selected workout
-  data.value = defaultData; // Reset all workout data
-  console.log('Rest plan activated, all workouts reset.');
-  localStorage.removeItem('workoutData'); // Clear local storage
+ 
+  
+  localStorage.removeItem('workoutData');
+   window.location.reload(); // Reload the page to reset the state
 }
+
 onMounted(() => {
-  console.log('App component unmounted');
-  if(!localStorage) {return; }
-  if(localStorage.getItem('workoutData')) {
-    data.value = JSON.parse(localStorage.getItem('workoutData'));
-    selectedDisplay.value = 2; // Switch to Dashboard display
-  } else {
-    console.log('No workout data found in local storage, using default data.');
+  if (!localStorage) {
+     
+    return;
+  }
+  if (localStorage.getItem('workoutData')) {
+    // only enter the if block if we find some data saved to the key workouts in localstroage database
+    const savedData = JSON.parse(localStorage.getItem('workoutData'));
+    data.value = savedData;
+    selectedDisplay.value = 2; // if they have data, then we dont want them landing on the welcome screen every time they enter the app
   }
 });
 </script>
