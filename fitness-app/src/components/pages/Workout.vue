@@ -40,7 +40,7 @@ console.log('Selected workout day:', isWorkoutComplete);
         <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <i class="fa-solid fa-dumbbell"></i>
       </div>
-      <h2>{{ workoutTypes[selectedWorkout % 3] }}  Workout</h2>
+      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
@@ -83,20 +83,18 @@ console.log('Selected workout day:', isWorkoutComplete);
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </div>
-       <input
-          v-model="data[selectedWorkout][exercise.name[0].toLowerCase() + exercise.name.slice(1)]"
-          
+        <input
+          v-model="data[selectedWorkout][exercise.name].sets"
           type="text"
           :placeholder="exercise.sets + ' sets'"
         />
-        <input 
-          v-model="data[selectedWorkout][exercise.name[1].toLowerCase() + exercise.name.slice(1)]"
-          
+        <input
+          v-model="data[selectedWorkout][exercise.name].reps"
           type="text"
           :placeholder="exercise.reps + ' reps'"
         />
         <input
-          v-model="data[selectedWorkout][exercise.name]"
+          v-model="data[selectedWorkout][exercise.name].weight"
           class="grid-weights"
           type="text"
           placeholder="23Kg"

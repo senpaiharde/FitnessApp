@@ -10,7 +10,7 @@ for (let workoutIdx in workoutProgram) {
   const workoutData = workoutProgram[workoutIdx];
   defaultData[workoutIdx] = {};
   for (let e of workoutData.workout) {
-    defaultData[workoutIdx][e.name] = '';
+    defaultData[workoutIdx][e.name] = { sets: '', reps: '', weight: '' };
   }
 }
 const selectedDisplay = ref(1);
@@ -18,30 +18,21 @@ const data = ref(defaultData);
 const selectedWorkout = ref(-1); // Example selected workout
 
 const isWorkoutComplete = computed(() => {
-  const currWorkout = data.value?.[selectedWorkout.value];
-  if (!currWorkout) {
-    return false;
-  } // guard clause to exit function
+  const curr = data.value[selectedWorkout];
+  if (!curr) return false;
 
-  const isCompleteCheck = Object.values(currWorkout).every((ex) => !!ex);
-  console.log('ISCOMPLETE CHECK:', isCompleteCheck);
-  return isCompleteCheck;
+  return Object.values(curr).every(
+    (ex) => ex.sets.trim() !== '' && ex.reps.trim() !== '' && ex.weight.trim() !== ''
+  );
 });
-
 const firstInCompletedWorkoutIndex = computed(() => {
-  const allWorkouts = data.value;
-  if (!allWorkouts) {
-    return -1;
+  for (const [idx, workoutObj] of Object.entries(data.value)) {
+    const allFilled = Object.values(workoutObj).every(
+      (ex) => ex.sets.trim() !== '' && ex.reps.trim() !== '' && ex.weight.trim() !== ''
+    );
+    if (!allFilled) return parseInt(idx);
   }
-
-  // loop over every key value pair, and check if the workout is complete or not
-  for (const [index, workout] of Object.entries(allWorkouts)) {
-    const isComplete = Object.values(workout).every((ex) => !!ex);
-    if (!isComplete) {
-      return parseInt(index);
-    }
-  }
-  return -1; // all are complete
+  return -1;
 });
 
 function handleChangeDisplay(idx) {
@@ -63,15 +54,12 @@ function handleSaveWorkout() {
 }
 
 function handleRestPlan() {
- 
-  
   localStorage.removeItem('workoutData');
-   window.location.reload(); // Reload the page to reset the state
+  window.location.reload(); // Reload the page to reset the state
 }
 
 onMounted(() => {
   if (!localStorage) {
-     
     return;
   }
   if (localStorage.getItem('workoutData')) {
