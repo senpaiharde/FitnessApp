@@ -142,10 +142,10 @@ function stopTimer() {
           <i class="fa-solid fa-stop"></i>
         </button>
 
-        <p class="time">
+        <button disabled class="time">
           {{ hour < 10 ? '0' + hour : hour }}: {{ minute < 10 ? '0' + minute : minute }}:
           {{ time < 10 ? '0' + time : time }}
-        </p>
+        </button>
       </div>
         <i class="fa-solid fa-dumbbell"></i>
         
@@ -234,6 +234,14 @@ function stopTimer() {
 </template>
 
 <style scoped>
+.time {
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  
+  color: var(--color-link);
+}
 #workout-card,
 .plan-card {
   display: flex;
