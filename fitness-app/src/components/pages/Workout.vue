@@ -1,5 +1,4 @@
 <script setup>
-
 import { computed, onMounted, ref, watch, reactive } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
@@ -22,8 +21,6 @@ const time = ref(0);
 const minute = ref(0);
 const hour = ref(0);
 const timerId = ref(null);
-
-
 
 onMounted(() => {
   const raw = localStorage.getItem('timerData');
@@ -67,12 +64,12 @@ function clearTimer() {
 let click = 0;
 // 2) start/stop functions
 function startTimer() {
-    click++;
-    if (click % 2 === 0) {
-      stopTimer();
-      click = 0;
-      return;
-    }
+  click++;
+  if (click % 2 === 0) {
+    stopTimer();
+    click = 0;
+    return;
+  }
   // if you already have one running, clear it
   if (timerId.value !== null) {
     clearInterval(timerId.value);
@@ -110,16 +107,18 @@ function stopTimer() {
 
 const handleSkip = () => {
   console.log('Skipping workout');
- workout.forEach((exercise) => {
+  workout.forEach((exercise) => {
     data[selectedWorkout][exercise.name].sets = 'skipped';
     data[selectedWorkout][exercise.name].reps = 'skipped';
     data[selectedWorkout][exercise.name].weight = 'skipped';
   });
   handleSaveWorkout();
-  
 };
+const isDivByThree = computed(() => {
+  return workoutTypes[selectedWorkout] === 'legs ' ? true : false;
+});
+console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[selectedWorkout % 3] === 'legs' ? true : false);
 </script>
-
 
 <template>
   <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
@@ -143,29 +142,30 @@ const handleSkip = () => {
       <div class="plan-card-header">
         <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <div class="plan-card-header">
-        <button @click="startTimer">
-          <i class="fa-solid fa-play"></i>
-        </button>
-        <button @click="stopTimer">
-          <i class="fa-solid fa-pause"></i>
-        </button>
-        <button @click="clearTimer">
-          <i class="fa-solid fa-stop"></i>
-        </button>
+          <button @click="startTimer">
+            <i class="fa-solid fa-play"></i>
+          </button>
+          <button @click="stopTimer">
+            <i class="fa-solid fa-pause"></i>
+          </button>
+          <button @click="clearTimer">
+            <i class="fa-solid fa-stop"></i>
+          </button>
 
-        <button disabled class="time">
-          {{ hour < 10 ? '0' + hour : hour }}: {{ minute < 10 ? '0' + minute : minute }}:
-          {{ time < 10 ? '0' + time : time }}
-        </button>
-      </div>
+          <button disabled class="time">
+            {{ hour < 10 ? '0' + hour : hour }}: {{ minute < 10 ? '0' + minute : minute }}:
+            {{ time < 10 ? '0' + time : time }}
+          </button>
+        </div>
         <i class="fa-solid fa-dumbbell"></i>
-        
       </div>
-      
-      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout </h2>
-      <button
-      
-      @click="handleSkip" >{{ workoutTypes[selectedWorkout % 3] ? 'Steps Time' : 'NO Natty' }}</button>
+
+      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
+      <button @click="handleSkip"
+      :disabled='workoutTypes[selectedWorkout % 3] === "legs" ? false : true'
+      >
+        {{ workoutTypes[selectedWorkout % 3] === 'legs' ? 'Steps Time?' : ''}}
+      </button>
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
@@ -252,7 +252,7 @@ const handleSkip = () => {
   justify-content: center;
   align-items: center;
   display: flex;
-  
+
   color: var(--color-link);
 }
 #workout-card,
