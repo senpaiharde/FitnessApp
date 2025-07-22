@@ -1,7 +1,9 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+
+import { computed, onMounted, ref, watch, reactive } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
+
 const { data, selectedWorkout, isWorkoutComplete } = defineProps({
   data: Object,
   selectedWorkout: Number,
@@ -20,18 +22,57 @@ const time = ref(0);
 const minute = ref(0);
 const hour = ref(0);
 const timerId = ref(null);
+
+
+
+onMounted(() => {
+  const raw = localStorage.getItem('timerData');
+
+  if (raw) {
+    Object.assign(timers, JSON.parse(raw));
+  }
+  // pull in today’s
+  const saved = timers[selectedWorkout];
+  if (saved) {
+    time.value = saved.time;
+    minute.value = saved.minute;
+    hour.value = saved.hour;
+  }
+  console.log('Timers loaded:', saved);
+  console.log('Timers loaded:', timers);
+  console.log('Current timer:', time.value, minute.value, hour.value);
+});
+
+watch(
+  () => selectedWorkout,
+  (idx) => {
+    const saved = timers[idx] || { time: 0, minute: 0, hour: 0 };
+    time.value = saved.time;
+    minute.value = saved.minute;
+    hour.value = saved.hour;
+  },
+  { immediate: true }
+);
+
 function clearTimer() {
   if (timerId.value !== null) {
     clearInterval(timerId.value);
     timerId.value = null;
-    time.value = 0; // Reset time when clearing the timer
-    minute = 0; // Reset minute
-    hour = 0; // Reset hour
+    time.value = 0;
+    minute.value = 0;
+    hour.value = 0;
     console.log('Timer cleared');
   }
 }
+let click = 0;
 // 2) start/stop functions
 function startTimer() {
+    click++;
+    if (click % 2 === 0) {
+      stopTimer();
+      click = 0;
+      return;
+    }
   // if you already have one running, clear it
   if (timerId.value !== null) {
     clearInterval(timerId.value);
@@ -47,7 +88,7 @@ function startTimer() {
     }
     if (minute === 60 && hour < 24) {
       hour++; // increment hour every 60 minutes
-      minute = 0; // reset minute
+      minute.value = 0; // reset minute
     }
   }, 1000);
 }
@@ -57,46 +98,17 @@ function stopTimer() {
     clearInterval(timerId.value);
     timerId.value = null;
     console.log('Timer stopped at', time.value, 'seconds');
-
-    timers[selectedWorkout] = {
-      time: time.value,
-      minute: minute.value,
-      hour: hour.value,
-    };
-
-    localStorage.setItem('timerData', JSON.stringify(timers));
   }
+  timers[selectedWorkout] = {
+    time: time.value,
+    minute: minute.value,
+    hour: hour.value,
+  };
+
+  localStorage.setItem('timerData', JSON.stringify(timers));
 }
-
-watch(
-  () => selectedWorkout,
-  (newVal) => {
-    if (timers[newVal]) {
-      time.value = timers[newVal].time || 0;
-      minute.value = timers[newVal].minute || 0;
-      hour.value = timers[newVal].hour || 0;
-    } else {
-      time.value = 0;
-      minute.value = 0;
-      hour.value = 0;
-    }
-  },
-  { immediate: true }
-);
-
-onMounted(() => {
-  // Load timer data from localStorage if available
-  const savedTimer = localStorage.getItem('timerData');
-  if (savedTimer) {
-    const { time: savedTime, minute: savedMinute, hour: savedHour } = JSON.parse(savedTimer);
-    time.value = savedTime || 0;
-    minute.value = savedMinute || 0;
-    hour.value = savedHour || 0;
-  }
-});
-
-
 </script>
+
 
 <template>
   <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
@@ -119,9 +131,7 @@ onMounted(() => {
     <div class="plan-card card">
       <div class="plan-card-header">
         <p>Day {{ day <= 9 ? '0' + day : day }}</p>
-        <i class="fa-solid fa-dumbbell"></i>
-      </div>
-      <div class="plan-card-header">
+        <div class="plan-card-header">
         <button @click="startTimer">
           <i class="fa-solid fa-play"></i>
         </button>
@@ -133,12 +143,16 @@ onMounted(() => {
         </button>
 
         <p class="time">
-          {{ hour <= 9 ? '0' + hour : hour }} : {{ minute <= 9 ? '0' + minute : minute }} :
-          {{ time <= 9 ? '0' + time : time }}
-          <input class="grid-weights" :value="timerData.time" />
+          {{ hour < 10 ? '0' + hour : hour }}: {{ minute < 10 ? '0' + minute : minute }}:
+          {{ time < 10 ? '0' + time : time }}
         </p>
       </div>
-      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
+        <i class="fa-solid fa-dumbbell"></i>
+        
+      </div>
+      
+      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout </h2>
+      
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
@@ -204,20 +218,14 @@ onMounted(() => {
       <button
         @click="
           () => {
-            console.log('Saving workout data', time);
             handleSaveWorkout();
-            console.log(saveTimerLocalStorage(time));
-            saveTimerLocalStorage(time);
           }
         "
       >
         Save & Exit
         <i class="fa-solid fa-save"></i>
       </button>
-      <button
-        :disabled="!isWorkoutComplete"
-        @click="handleSaveWorkout, console.log(saveTimerLocalStorage(time))"
-      >
+      <button :disabled="!isWorkoutComplete" @click="handleSaveWorkout">
         Complete
         <i class="fa-solid fa-check"></i>
       </button>
