@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 const { data, selectedWorkout, isWorkoutComplete } = defineProps({
@@ -15,11 +15,11 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
 console.log('Workout component loaded', selectedWorkout, workout, warmup, exerciseDescription);
 const day = selectedWorkout + 1;
 console.log('Selected workout day:', isWorkoutComplete);
-
-const time = ref(0)
-const timerId = ref(null)
-let minute = 0
-let hour = 0
+const timers = reactive({});
+const time = ref(0);
+const minute = ref(0);
+const hour = ref(0);
+const timerId = ref(null);
 function clearTimer() {
   if (timerId.value !== null) {
     clearInterval(timerId.value);
@@ -33,29 +33,43 @@ function clearTimer() {
 // 2) start/stop functions
 function startTimer() {
   // if you already have one running, clear it
- 
+  if (timerId.value !== null) {
+    clearInterval(timerId.value);
+  }
 
-  time.value = time.value || 0 // reset time if needed
+  time.value = time.value || 0; // reset time if needed
   timerId.value = setInterval(() => {
-    time.value++
-    if(time.value % 60 === 0) {
-      minute ++ // increment minute every 60 seconds
+    time.value++;
+
+    if (time.value % 60 === 0) {
+      minute++; // increment minute every 60 seconds
+      time.value = 0;
     }
-    if(time.value % 3600 === 0) {
-      hour ++ // increment hour every 3600 seconds
+    if (minute === 60 && hour < 24) {
+      hour++; // increment hour every 60 minutes
+      minute = 0; // reset minute
     }
-    
-  }, 1000)
+  }, 1000);
 }
 
 function stopTimer() {
   if (timerId.value !== null) {
-    clearInterval(timerId.value)
-    timerId.value = null
-    console.log('Timer stopped at', time.value, 'seconds')
+    clearInterval(timerId.value);
+    timerId.value = null;
+    console.log('Timer stopped at', time.value, 'seconds');
   }
 }
 
+onMounted(() => {
+  // Load timer data from localStorage if available
+  const savedTimer = localStorage.getItem('timerData');
+  if (savedTimer) {
+    const { time: savedTime, minute: savedMinute, hour: savedHour } = JSON.parse(savedTimer);
+    time.value = savedTime || 0;
+    minute.value = savedMinute || 0;
+    hour.value = savedHour || 0;
+  }
+});
 </script>
 
 <template>
@@ -81,12 +95,24 @@ function stopTimer() {
         <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <i class="fa-solid fa-dumbbell"></i>
       </div>
-      <h2>
-        {{ workoutTypes[selectedWorkout % 3] }} Workout
-        <button @click="startTimer">Start Timer</button>
-        <button @click="stopTimer">step Timer</button>
-        <h2>{{ time }}</h2>
-      </h2>
+      <div class="plan-card-header">
+        <button @click="startTimer">
+          <i class="fa-solid fa-play"></i>
+        </button>
+        <button @click="stopTimer">
+          <i class="fa-solid fa-pause"></i>
+        </button>
+        <button @click="clearTimer">
+          <i class="fa-solid fa-stop"></i>
+        </button>
+
+        <p class="time">
+          {{ hour <= 9 ? '0' + hour : hour }} : {{ minute <= 9 ? '0' + minute : minute }} :
+          {{ time <= 9 ? '0' + time : time }}
+          <input class="grid-weights" :value="timerData.time" />
+        </p>
+      </div>
+      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
@@ -149,11 +175,23 @@ function stopTimer() {
     </div>
 
     <div class="card workout-btns">
-      <button @click="handleSaveWorkout">
+      <button
+        @click="
+          () => {
+            console.log('Saving workout data', time);
+            handleSaveWorkout();
+            console.log(saveTimerLocalStorage(time));
+            saveTimerLocalStorage(time);
+          }
+        "
+      >
         Save & Exit
         <i class="fa-solid fa-save"></i>
       </button>
-      <button :disabled="!isWorkoutComplete" @click="handleSaveWorkout">
+      <button
+        :disabled="!isWorkoutComplete"
+        @click="handleSaveWorkout, console.log(saveTimerLocalStorage(time))"
+      >
         Complete
         <i class="fa-solid fa-check"></i>
       </button>
