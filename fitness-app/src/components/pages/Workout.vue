@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 const { data, selectedWorkout, isWorkoutComplete } = defineProps({
@@ -57,8 +57,32 @@ function stopTimer() {
     clearInterval(timerId.value);
     timerId.value = null;
     console.log('Timer stopped at', time.value, 'seconds');
+
+    timers[selectedWorkout] = {
+      time: time.value,
+      minute: minute.value,
+      hour: hour.value,
+    };
+
+    localStorage.setItem('timerData', JSON.stringify(timers));
   }
 }
+
+watch(
+  () => selectedWorkout,
+  (newVal) => {
+    if (timers[newVal]) {
+      time.value = timers[newVal].time || 0;
+      minute.value = timers[newVal].minute || 0;
+      hour.value = timers[newVal].hour || 0;
+    } else {
+      time.value = 0;
+      minute.value = 0;
+      hour.value = 0;
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   // Load timer data from localStorage if available
@@ -70,6 +94,8 @@ onMounted(() => {
     hour.value = savedHour || 0;
   }
 });
+
+
 </script>
 
 <template>
