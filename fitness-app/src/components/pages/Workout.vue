@@ -107,6 +107,17 @@ function stopTimer() {
 
   localStorage.setItem('timerData', JSON.stringify(timers));
 }
+
+const handleSkip = () => {
+  console.log('Skipping workout');
+ workout.forEach((exercise) => {
+    data[selectedWorkout][exercise.name].sets = 'skipped';
+    data[selectedWorkout][exercise.name].reps = 'skipped';
+    data[selectedWorkout][exercise.name].weight = 'skipped';
+  });
+  handleSaveWorkout();
+  
+};
 </script>
 
 
@@ -152,7 +163,9 @@ function stopTimer() {
       </div>
       
       <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout </h2>
+      <button
       
+      @click="handleSkip" >{{ workoutTypes[selectedWorkout % 3] ? 'Steps Time' : 'NO Natty' }}</button>
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
