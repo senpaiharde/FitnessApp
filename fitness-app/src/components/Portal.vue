@@ -2,6 +2,7 @@
 import { Teleport } from 'vue';
 const { onClose } = defineProps({
   onClose: Function,
+  
 });
 
 console.log('Portal component loaded', onClose);

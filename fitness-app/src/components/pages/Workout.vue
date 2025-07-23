@@ -104,9 +104,10 @@ function stopTimer() {
 
   localStorage.setItem('timerData', JSON.stringify(timers));
 }
-
+const stepsPortal = ref(null);
 const handleSkip = () => {
   console.log('Skipping workout');
+
   workout.forEach((exercise) => {
     data[selectedWorkout][exercise.name].sets = 'skipped';
     data[selectedWorkout][exercise.name].reps = 'skipped';
@@ -121,7 +122,23 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
 </script>
 
 <template>
-  <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
+  <Portal :onClose="() => (stepsPortal = null)" v-if="stepsPortal">
+    <div class="exercise-description">
+      <h3>{{ selectedExercise }}</h3>
+
+      <div class="exercise-image">
+        <small>Description daddy </small>
+        <p class="exercise-description">
+          {{ exerciseDescription || 'No description available for this exercise.' }}
+        </p>
+      </div>
+      <button @click="() => (stepsPortal = null)">
+        Close
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </Portal>
+  <Portal :onClose="() => (stepsPortal = null)" v-if="stepsPortal && isDivByThree">
     <div class="exercise-description">
       <h3>{{ selectedExercise }}</h3>
 
@@ -131,7 +148,11 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
           {{ exerciseDescription || 'No description available for this exercise.' }}
         </p>
       </div>
-      <button @click="() => (selectedExercise = null)">
+      <button @click="() => (stepsPortal = null,
+      console.log(handleSaveWorkout,'daddy'),
+      handleSaveWorkout()
+
+      )">
         Close
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -161,11 +182,16 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
       </div>
 
       <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
-      <button @click="handleSkip"
+      <button @click="() => {
+        stepsPortal = true;
+        handleSkip();
+        s
+      }"
       :disabled='workoutTypes[selectedWorkout % 3] === "legs" ? false : true'
       >
         {{ workoutTypes[selectedWorkout % 3] === 'legs' ? 'Steps Time?' : ''}}
       </button>
+      
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
