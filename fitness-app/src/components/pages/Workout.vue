@@ -122,7 +122,7 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
 </script>
 
 <template>
-  <Portal :onClose="() => (stepsPortal = null)" v-if="stepsPortal">
+  <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
     <div class="exercise-description">
       <h3>{{ selectedExercise }}</h3>
 
@@ -132,13 +132,13 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
           {{ exerciseDescription || 'No description available for this exercise.' }}
         </p>
       </div>
-      <button @click="() => (stepsPortal = null)">
+      <button @click="() => (selectedExercise = null)">
         Close
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
   </Portal>
-  <Portal :onClose="() => (stepsPortal = null)" v-if="stepsPortal && isDivByThree">
+  <Portal :onClose="() => (stepsPortal = null)" v-if="stepsPortal">
     <div class="exercise-description">
       <h3>{{ selectedExercise }}</h3>
 
@@ -148,14 +148,28 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
           {{ exerciseDescription || 'No description available for this exercise.' }}
         </p>
       </div>
-      <button @click="() => (stepsPortal = null,
-      console.log(handleSaveWorkout,'daddy'),
-      handleSaveWorkout()
-
+      <div class="exercise-image">
+        <small>Steps</small>
+        <p class="exercise-description">
+         while you Skipped the workout, you can add your steps here.
+            <br />
+            <input
+              v-model="data[selectedWorkout].steps"
+              type="text"
+              placeholder="Enter steps here">
+        </p>
+        <button @click="handleSaveWorkout">
+        Next workout
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+       
+      <button @click="() => (stepsPortal = null 
       )">
         Close
         <i class="fa-solid fa-xmark"></i>
       </button>
+      </div>
+      
     </div>
   </Portal>
   <section id="workout-card">
