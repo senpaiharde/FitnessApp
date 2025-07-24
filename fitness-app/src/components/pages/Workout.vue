@@ -35,9 +35,7 @@ onMounted(() => {
     minute.value = saved.minute;
     hour.value = saved.hour;
   }
-  console.log('Timers loaded:', saved);
-  console.log('Timers loaded:', timers);
-  console.log('Current timer:', time.value, minute.value, hour.value);
+ 
 });
 
 watch(

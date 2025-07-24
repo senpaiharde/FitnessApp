@@ -5,6 +5,7 @@ import Dashboard from './components/pages/Dashboard.vue';
 import Workout from './components/pages/Workout.vue';
 import { ref, computed, onUnmounted, onMounted } from 'vue';
 import { workoutProgram } from './utils';
+import { loadAppData, removeAppdata, updateAppData } from './service/storage';
 const defaultData = {};
 for (let workoutIdx in workoutProgram) {
   const workoutData = workoutProgram[workoutIdx];
@@ -42,11 +43,12 @@ function handleChangeDisplay(idx) {
 function handleSelectWorkout(idx) {
   selectedDisplay.value = 3; // Switch to Workout display
   selectedWorkout.value = idx;
-  console.log('Selected workout:', idx);
+ 
 }
 
 function handleSaveWorkout() {
-  localStorage.setItem('workoutData', JSON.stringify(data.value));
+    updateAppData({workoutData: data.value})
+  //localStorage.setItem('workoutData', JSON.stringify(data.value));
 
   selectedDisplay.value = 2; // Switch back to Dashboard display
 
@@ -54,20 +56,19 @@ function handleSaveWorkout() {
 }
 
 function handleRestPlan() {
-  localStorage.removeItem('workoutData');
+    removeAppdata()
   window.location.reload(); // Reload the page to reset the state
 }
 
 onMounted(() => {
-  if (!localStorage) {
-    return;
-  }
-  if (localStorage.getItem('workoutData')) {
+  
+ 
     // only enter the if block if we find some data saved to the key workouts in localstroage database
-    const savedData = JSON.parse(localStorage.getItem('workoutData'));
-    data.value = savedData;
+    let { workoutData } = loadAppData();
+    
+    data.value = workoutData ?? defaultData;
     selectedDisplay.value = 2; // if they have data, then we dont want them landing on the welcome screen every time they enter the app
-  }
+  
 });
 </script>
 
