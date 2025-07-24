@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch, reactive } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
+import { loadAppData, updateAppData } from '../../service/storage';
 
 const { data, selectedWorkout, isWorkoutComplete } = defineProps({
   data: Object,
@@ -23,10 +24,12 @@ const hour = ref(0);
 const timerId = ref(null);
 const steps = ref(0);
 onMounted(() => {
-  const raw = localStorage.getItem('timerData');
+    let { timerData,workoutData} =  loadAppData()
+    
+  //const raw = localStorage.getItem('timerData');
 
-  if (raw) {
-    Object.assign(timers, JSON.parse(raw));
+  if (timerData) {
+    Object.assign(timers, timerData);
   }
   // pull in today’s
   const saved = timers[selectedWorkout];
@@ -35,7 +38,11 @@ onMounted(() => {
     minute.value = saved.minute;
     hour.value = saved.hour;
   }
- 
+  if(workoutData) {
+    data.value = workoutData;
+    selectedDisplay.value = 2
+    steps.value = data.value[selectedWorkout]?.steps || 0;
+  }
 });
 
 watch(
@@ -45,7 +52,9 @@ watch(
     time.value = saved.time;
     minute.value = saved.minute;
     hour.value = saved.hour;
+    steps.value = data.value[idx]?.steps || 0;
   },
+  
   { immediate: true }
 );
 
@@ -99,8 +108,9 @@ function stopTimer() {
     minute: minute.value,
     hour: hour.value,
   };
-
-  localStorage.setItem('timerData', JSON.stringify(timers));
+   updateAppData({timerData: timers})
+  //localStorage.setItem('timerData', JSON.stringify(timers));
+ 
 }
 const stepsPortal = ref(null);
 const handleSkip = () => {
@@ -113,22 +123,17 @@ const handleSkip = () => {
   });
   handleSaveWorkout();
 };
-const isDivByThree = computed(() => {
-  return workoutTypes[selectedWorkout] === 'legs ' ? true : false;
-});
-console.log(
-  'isDivByThree:',
-  isDivByThree.value,
-  'Workout type:',
-  workoutTypes[selectedWorkout % 3] === 'legs' ? true : false
-);
+
+
+
 const saveSteps = () => {
   if (steps.value < 1) {
     console.warn('Please enter a valid number of steps.');
     return;
   }
-  
-  localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
+  data[selectedWorkout].steps = steps.value
+  updateAppData({workoutData: data})
+  //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
   console.log(steps.value)
 };
 </script>
