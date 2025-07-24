@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+const { handleChangeDisplay } = defineProps({
+  handleChangeDisplay: Function,
+});
+</script>
 
 <template>
   <header>
@@ -10,7 +14,7 @@
                 Dashboard
             </button>
                 <button 
-                @click=""
+               @click="() => handleChangeDisplay(2)"
                 class="HeaderButton">
                 Workout
             </button>

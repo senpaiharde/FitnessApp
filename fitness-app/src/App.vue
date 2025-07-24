@@ -72,7 +72,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Layouts>
+  <Layouts :handleChangeDisplay="handleChangeDisplay" >
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
     <Dashboard
