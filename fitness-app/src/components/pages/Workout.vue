@@ -21,7 +21,7 @@ const time = ref(0);
 const minute = ref(0);
 const hour = ref(0);
 const timerId = ref(null);
-
+const steps = ref(0);
 onMounted(() => {
   const raw = localStorage.getItem('timerData');
 
@@ -118,9 +118,22 @@ const handleSkip = () => {
 const isDivByThree = computed(() => {
   return workoutTypes[selectedWorkout] === 'legs ' ? true : false;
 });
-console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[selectedWorkout % 3] === 'legs' ? true : false);
+console.log(
+  'isDivByThree:',
+  isDivByThree.value,
+  'Workout type:',
+  workoutTypes[selectedWorkout % 3] === 'legs' ? true : false
+);
+const saveSteps = () => {
+  if (steps.value < 1) {
+    console.warn('Please enter a valid number of steps.');
+    return;
+  }
+  
+  localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
+  console.log(steps.value)
+};
 </script>
-
 <template>
   <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
     <div class="exercise-description">
@@ -151,25 +164,25 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
       <div class="exercise-image">
         <small>Steps</small>
         <p class="exercise-description">
-         while you Skipped the workout, you can add your steps here.
-            <br />
-            <input
-              v-model="data[selectedWorkout].steps"
-              type="text"
-              placeholder="Enter steps here">
+          {{ steps || 'No steps recorded for this workout.' }}
         </p>
-        <button @click="handleSaveWorkout">
-        Next workout
-        <i class="fa-solid fa-arrow-right"></i>
-      </button>
-       
-      <button @click="() => (stepsPortal = null 
-      )">
-        Close
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+        <p class="exercise-description">
+          while you Skipped the workout, you can add your steps here.
+          <br />
+          <input v-model="steps" type="range" :range="(0, 20000)" min="0" max="20000" />
+        </p>
+
+        <div class="exercise-btns">
+          <button @click="() => ((stepsPortal = null), saveSteps, console.log(saveSteps, 'steps'))">
+            Close
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+          <button @click="handleSaveWorkout">
+            Next workout
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
       </div>
-      
     </div>
   </Portal>
   <section id="workout-card">
@@ -196,16 +209,18 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
       </div>
 
       <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
-      <button @click="() => {
-        stepsPortal = true;
-        handleSkip();
-        s
-      }"
-      :disabled='workoutTypes[selectedWorkout % 3] === "legs" ? false : true'
+      <button
+        @click="
+          () => {
+            stepsPortal = true;
+            handleSkip();
+            s;
+          }
+        "
+        :disabled="workoutTypes[selectedWorkout % 3] === 'legs' ? false : true"
       >
-        {{ workoutTypes[selectedWorkout % 3] === 'legs' ? 'Steps Time?' : ''}}
+        {{ workoutTypes[selectedWorkout % 3] === 'legs' ? 'Steps Time?' : '' }}
       </button>
-      
     </div>
     <div class="workout-grid">
       <h4 class="grid-name">Warmup</h4>
@@ -287,6 +302,13 @@ console.log('isDivByThree:', isDivByThree.value , 'Workout type:', workoutTypes[
 </template>
 
 <style scoped>
+.exercise-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
 .time {
   font-weight: bold;
   justify-content: center;

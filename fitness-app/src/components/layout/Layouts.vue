@@ -2,7 +2,25 @@
 
 <template>
   <header>
-    <h1>Fitness App</h1>
+    <div class="HeaderTop"> 
+         <h1>Fitness App
+            </h1>
+            <div class=""> 
+                <button>
+                Dashboard
+            </button>
+                <button 
+                @click=""
+                class="HeaderButton">
+                Workout
+            </button>
+               </div>
+            
+    </div>
+   
+    
+
+    
   </header>
   <main>
     <slot></slot>
@@ -19,6 +37,14 @@
 </template>
 
 <style scoped>
+.HeaderButton{
+    margin-left: 0.5rem;
+    
+}
+.HeaderTop{
+    display: flex;
+    justify-content: space-between;
+}
  header, footer, main {
         padding: 1rem;
         width: 100%;
