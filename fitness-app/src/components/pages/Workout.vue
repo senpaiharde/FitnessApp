@@ -188,7 +188,7 @@ const saveSteps = () => {
   <section id="workout-card">
     <div class="plan-card card">
       <div class="plan-card-header">
-        <p>Day {{ day <= 9 ? '0' + day : day }}</p>
+        <p>Day {{ day <= 9 ? '0' + day : day  }}</p>
         <div class="plan-card-header">
           <button @click="startTimer">
             <i class="fa-solid fa-play"></i>
