@@ -1,8 +1,8 @@
 import { v4 } from "uuid";
 interface AppData {
-  timerData:  null;
-  workoutData: string;
-  steps: string;
+  timerData: Record<number, { time: number; minute: number; hour: number }> | null;
+  workoutData: Record<string, any>;  // or your specific workout shape
+  steps: number;
 }
 export function getUserId() {
  let id = localStorage.getItem('userId');
@@ -22,7 +22,7 @@ export function loadAppData(): AppData {
 
     return raw 
     ? JSON.parse(raw) as AppData
-    : {timerData: null, workoutData: '', steps: ''}
+    : { timerData: null, workoutData: {}, steps: 0 };
 }
 
 

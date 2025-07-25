@@ -2,14 +2,14 @@
 import { computed, onMounted, ref, watch, reactive } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
-import { loadAppData, updateAppData } from '../../service/storage';
+
 
 const props = defineProps({
-   handleSaveSteps: Function,
-   handleSaveTimerData: Function,
+  handleSaveSteps: Function,
+  handleSaveTimerData: Function,
   timerData: Object,
   steps: Number,
-    workoutData: Object,
+  workoutData: Object,
   selectedWorkout: Number,
   isWorkoutComplete: Boolean,
   handleSaveWorkout: Function,
@@ -21,14 +21,14 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
 
 const day = selectedWorkout + 1;
 
-let timers = reactive({});
+let timers = reactive(props.timerData || {});
 let time = ref(0);
 let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
-let steps = ref(0);
+let steps = ref(props.steps || 0);
 
-const data = ref(props.workoutData);
+const data = reactive(props.workoutData || {});
 
 onMounted(() => {
   let workoutData = props.workoutData || {};
@@ -52,7 +52,6 @@ onMounted(() => {
     steps.value = data.value[selectedWorkout]?.steps || 0;
   }
 });
-
 
 watch(
   () => selectedWorkout,
@@ -116,8 +115,8 @@ function stopTimer() {
     minute: minute.value,
     hour: hour.value,
   };
-    props.handleSaveTimerData(steps.value);
- 
+  props.handleSaveTimerData(timers);
+
   //localStorage.setItem('timerData', JSON.stringify(timers));
 }
 const stepsPortal = ref(null);
@@ -129,10 +128,7 @@ const handleSkip = () => {
     data[selectedWorkout][exercise.name].reps = 'skipped';
     data[selectedWorkout][exercise.name].weight = 'skipped';
   });
-  props.handleSaveWorkout(workout.value);
-   
-
-  
+  props.handleSaveWorkout(data.value);
 };
 
 const saveSteps = () => {
@@ -142,7 +138,7 @@ const saveSteps = () => {
   }
   data[selectedWorkout].steps = steps.value;
 
-   props.handleSaveTimerData(steps.value);
+  props.handleSaveSteps(steps.value);
   //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
   console.log(steps.value);
 };

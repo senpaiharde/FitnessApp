@@ -16,20 +16,20 @@ for (let workoutIdx in workoutProgram) {
 }
 
 const appData = reactive({
-    timerData: {},
-    workoutData: defaultData,
-    steps: 0,
-})
+  timerData: {},
+  workoutData: defaultData,
+  steps: 0,
+});
 onMounted(() => {
   // only enter the if block if we find some data saved to the key workouts in localstroage database
- const store = loadAppData();
+  const store = loadAppData();
   const workoutData = store?.workoutData || defaultData;
   appData.timerData = store?.timerData || {};
   appData.workoutData = workoutData;
   appData.steps = store?.steps || 0;
 
   // Set the initial selected display based on whether workout data exists
- selectedDisplay.value = workoutData ? 2 : 1; // if they have data, then we dont want them landing on the welcome screen every time they enter the app
+  selectedDisplay.value = workoutData ? 2 : 1; // if they have data, then we dont want them landing on the welcome screen every time they enter the app
 });
 const selectedDisplay = ref(1);
 const data = ref(defaultData);
@@ -58,13 +58,12 @@ function handleChangeDisplay(idx) {
 }
 
 function handleSelectWorkout(idx) {
-  
   selectedDisplay.value = 3; // Switch to Workout display
   selectedWorkout.value = idx;
 }
 
 function handleSaveWorkout() {
-    appData.workoutData[selectedWorkout.value] = data.value[selectedWorkout.value];
+  appData.workoutData[selectedWorkout.value] = data.value[selectedWorkout.value];
   updateAppData({ workoutData: data.value });
   //localStorage.setItem('workoutData', JSON.stringify(data.value));
 
@@ -75,17 +74,17 @@ function handleSaveWorkout() {
 
 function handleRestPlan() {
   removeAppdata();
-    appData.workoutData = defaultData; // Reset workout data
-    appData.timerData = {};
-    appData.steps = 0; // Reset steps
-    selectedDisplay.value = 1; // Switch back to Welcome display
+  appData.workoutData = defaultData; // Reset workout data
+  appData.timerData = {};
+  appData.steps = 0; // Reset steps
+  selectedDisplay.value = 1; // Switch back to Welcome display
   window.location.reload(); // Reload the page to reset the state
 }
 function handleSaveTimerData() {
   updateAppData({ timerData: appData.timerData });
 }
 
- function handleSaveSteps() {
+function handleSaveSteps() {
   updateAppData({ steps: appData.steps });
 }
 </script>
@@ -102,15 +101,16 @@ function handleSaveTimerData() {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
-         :timerData="appData.timerData"
-          :steps="appData.steps"
-          :workoutData = "appData.workoutData"
-        :handleSaveSteps="handleSaveSteps"
-        :handleSaveTimerData="handleSaveTimerData"
+      :timerData="appData.timerData"
+      :steps="appData.steps"
+      :workoutData="appData.workoutData"
+      :handleSaveSteps="handleSaveSteps"
+      :handleSaveTimerData="handleSaveTimerData"
       :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
       :data="data"
       :selectedWorkout="selectedWorkout"
+      v-else-if="selectedDisplay == 3 && selectedWorkout >= 0"
       v-if="workoutProgram?.[selectedWorkout]"
     />
     <!-- The Workout component will be displayed after the Dashboard component -->
