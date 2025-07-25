@@ -14,9 +14,9 @@ const workoutTypes = ['push', 'pull', 'legs'];
 const { workout, warmup } = workoutProgram[selectedWorkout];
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
-console.log('Workout component loaded', selectedWorkout, workout, warmup, exerciseDescription);
+
 const day = selectedWorkout + 1;
-console.log('Selected workout day:', isWorkoutComplete);
+
 let timers = reactive({});
 let time = ref(0);
 let minute = ref(0);
@@ -24,9 +24,12 @@ let hour = ref(0);
 let timerId = ref(null);
 let steps = ref(0);
 console.log(loadAppData(), 'comeon');
+let workoutData = loadAppData()?.workoutData;
 onMounted(() => {
-  let { timerData, workoutData } = loadAppData();
-  console.log(timerData, workoutData, 'daddyslava');
+  let workoutData = loadAppData()?.workoutData;
+  let timerData = loadAppData()?.timerData;
+  console.log('Loaded workout data:', workoutData);
+  console.log('Loaded timer data:', timerData);
   //const raw = localStorage.getItem('timerData');
 
   if (timerData) {
@@ -44,7 +47,7 @@ onMounted(() => {
     steps.value = data.value[selectedWorkout]?.steps || 0;
   }
 });
-console.log(timers, selectedWorkout, 'sd');
+console.log(timers, selectedWorkout, 'sd', data, 'data.value',workoutData);
 watch(
   () => selectedWorkout,
   (idx) => {
