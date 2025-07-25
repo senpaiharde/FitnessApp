@@ -4,8 +4,12 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 import { loadAppData, updateAppData } from '../../service/storage';
 
-const { data, selectedWorkout, isWorkoutComplete } = defineProps({
-  data: Object,
+const props = defineProps({
+   handleSaveSteps: Function,
+   handleSaveTimerData: Function,
+  timerData: Object,
+  steps: Number,
+    workoutData: Object,
   selectedWorkout: Number,
   isWorkoutComplete: Boolean,
   handleSaveWorkout: Function,
@@ -23,11 +27,12 @@ let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
 let steps = ref(0);
-console.log(loadAppData(), 'comeon');
-let workoutData = loadAppData()?.workoutData;
+
+const data = ref(props.workoutData);
+
 onMounted(() => {
-  let workoutData = loadAppData()?.workoutData;
-  let timerData = loadAppData()?.timerData;
+  let workoutData = props.workoutData || {};
+  let timerData = props.timerData || {};
   console.log('Loaded workout data:', workoutData);
   console.log('Loaded timer data:', timerData);
   //const raw = localStorage.getItem('timerData');
@@ -47,7 +52,8 @@ onMounted(() => {
     steps.value = data.value[selectedWorkout]?.steps || 0;
   }
 });
-console.log(timers, selectedWorkout, 'sd', data, 'data.value',workoutData);
+
+
 watch(
   () => selectedWorkout,
   (idx) => {
@@ -110,7 +116,8 @@ function stopTimer() {
     minute: minute.value,
     hour: hour.value,
   };
-  updateAppData({ timerData: timers });
+    props.handleSaveTimerData(steps.value);
+ 
   //localStorage.setItem('timerData', JSON.stringify(timers));
 }
 const stepsPortal = ref(null);
@@ -122,7 +129,10 @@ const handleSkip = () => {
     data[selectedWorkout][exercise.name].reps = 'skipped';
     data[selectedWorkout][exercise.name].weight = 'skipped';
   });
-  handleSaveWorkout();
+  props.handleSaveWorkout(workout.value);
+   
+
+  
 };
 
 const saveSteps = () => {
@@ -132,7 +142,7 @@ const saveSteps = () => {
   }
   data[selectedWorkout].steps = steps.value;
 
-  updateAppData({ workoutData: data });
+   props.handleSaveTimerData(steps.value);
   //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
   console.log(steps.value);
 };
@@ -289,14 +299,14 @@ const saveSteps = () => {
       <button
         @click="
           () => {
-            handleSaveWorkout();
+            props.handleSaveWorkout();
           }
         "
       >
         Save & Exit
         <i class="fa-solid fa-save"></i>
       </button>
-      <button :disabled="!isWorkoutComplete" @click="handleSaveWorkout">
+      <button :disabled="!props.isWorkoutComplete" @click="props.handleSaveWorkout">
         Complete
         <i class="fa-solid fa-check"></i>
       </button>

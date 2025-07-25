@@ -85,7 +85,9 @@ function handleSaveTimerData() {
   updateAppData({ timerData: appData.timerData });
 }
 
-
+ function handleSaveSteps() {
+  updateAppData({ steps: appData.steps });
+}
 </script>
 
 <template>
@@ -100,6 +102,11 @@ function handleSaveTimerData() {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
+         :timerData="appData.timerData"
+          :steps="appData.steps"
+          :workoutData = "appData.workoutData"
+        :handleSaveSteps="handleSaveSteps"
+        :handleSaveTimerData="handleSaveTimerData"
       :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
       :data="data"
