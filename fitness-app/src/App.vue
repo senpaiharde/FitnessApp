@@ -41,13 +41,13 @@ function handleChangeDisplay(idx) {
 }
 
 function handleSelectWorkout(idx) {
+  console.log(idx, 'daddy');
   selectedDisplay.value = 3; // Switch to Workout display
   selectedWorkout.value = idx;
- 
 }
 
 function handleSaveWorkout() {
-    updateAppData({workoutData: data.value})
+  updateAppData({ workoutData: data.value });
   //localStorage.setItem('workoutData', JSON.stringify(data.value));
 
   selectedDisplay.value = 2; // Switch back to Dashboard display
@@ -56,24 +56,22 @@ function handleSaveWorkout() {
 }
 
 function handleRestPlan() {
-    removeAppdata()
+  removeAppdata();
   window.location.reload(); // Reload the page to reset the state
 }
 
 onMounted(() => {
-  
- 
-    // only enter the if block if we find some data saved to the key workouts in localstroage database
-    let { workoutData } = loadAppData();
-    
-    data.value = workoutData ?? defaultData;
-    selectedDisplay.value = 2; // if they have data, then we dont want them landing on the welcome screen every time they enter the app
-  
+  // only enter the if block if we find some data saved to the key workouts in localstroage database
+  let { workoutData } = loadAppData();
+  console.log(workoutData, 'workoutdata')
+  data.value = workoutData ?? defaultData;
+  console.log(data.value , 'data.value')
+ selectedDisplay.value = workoutData ? 2 : 1; // if they have data, then we dont want them landing on the welcome screen every time they enter the app
 });
 </script>
 
 <template>
-  <Layouts :handleChangeDisplay="handleChangeDisplay" >
+  <Layouts :handleChangeDisplay="handleChangeDisplay">
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
     <Dashboard

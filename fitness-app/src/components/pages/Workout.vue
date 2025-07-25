@@ -17,34 +17,34 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
 console.log('Workout component loaded', selectedWorkout, workout, warmup, exerciseDescription);
 const day = selectedWorkout + 1;
 console.log('Selected workout day:', isWorkoutComplete);
-const timers = reactive({});
-const time = ref(0);
-const minute = ref(0);
-const hour = ref(0);
-const timerId = ref(null);
-const steps = ref(0);
+let timers = reactive({});
+let time = ref(0);
+let minute = ref(0);
+let hour = ref(0);
+let timerId = ref(null);
+let steps = ref(0);
+console.log(loadAppData(), 'comeon');
 onMounted(() => {
-    let { timerData,workoutData} =  loadAppData()
-    
+  let { timerData, workoutData } = loadAppData();
+  console.log(timerData, workoutData, 'daddyslava');
   //const raw = localStorage.getItem('timerData');
 
   if (timerData) {
     Object.assign(timers, timerData);
+    const savedTimer = timers[selectedWorkout];
+    if (savedTimer) {
+      time.value = savedTimer.time;
+      minute.value = savedTimer.minute;
+      hour.value = savedTimer.hour;
+    }
   }
-  // pull in today’s
-  const saved = timers[selectedWorkout];
-  if (saved) {
-    time.value = saved.time;
-    minute.value = saved.minute;
-    hour.value = saved.hour;
-  }
-  if(workoutData) {
+  if (workoutData) {
     data.value = workoutData;
-    selectedDisplay.value = 2
+    selectedDisplay.value = 2;
     steps.value = data.value[selectedWorkout]?.steps || 0;
   }
 });
-
+console.log(timers, selectedWorkout, 'sd');
 watch(
   () => selectedWorkout,
   (idx) => {
@@ -52,9 +52,8 @@ watch(
     time.value = saved.time;
     minute.value = saved.minute;
     hour.value = saved.hour;
-    steps.value = data.value[idx]?.steps || 0;
   },
-  
+
   { immediate: true }
 );
 
@@ -108,9 +107,8 @@ function stopTimer() {
     minute: minute.value,
     hour: hour.value,
   };
-   updateAppData({timerData: timers})
+  updateAppData({ timerData: timers });
   //localStorage.setItem('timerData', JSON.stringify(timers));
- 
 }
 const stepsPortal = ref(null);
 const handleSkip = () => {
@@ -124,17 +122,16 @@ const handleSkip = () => {
   handleSaveWorkout();
 };
 
-
-
 const saveSteps = () => {
   if (steps.value < 1) {
     console.warn('Please enter a valid number of steps.');
     return;
   }
-  data[selectedWorkout].steps = steps.value
-  updateAppData({workoutData: data})
+  data[selectedWorkout].steps = steps.value;
+
+  updateAppData({ workoutData: data });
   //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
-  console.log(steps.value)
+  console.log(steps.value);
 };
 </script>
 <template>
@@ -191,7 +188,7 @@ const saveSteps = () => {
   <section id="workout-card">
     <div class="plan-card card">
       <div class="plan-card-header">
-        <p>Day {{ day <= 9 ? '0' + day : day  }}</p>
+        <p>Day {{ day <= 9 ? '0' + day : day }}</p>
         <div class="plan-card-header">
           <button @click="startTimer">
             <i class="fa-solid fa-play"></i>
