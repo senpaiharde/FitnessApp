@@ -25,17 +25,27 @@ const appData = reactive({
 });
 onMounted(() => {
   // only enter the if block if we find some data saved to the key workouts in localstroage database
-  const store = loadAppData();
-  const hasSaved = !!store?.workoutData;
+ const store = loadAppData() || {};
+  const loadedData = store.workoutData || {};
+
+  // Ensure every workout index exists by merging defaults
+  const mergedData = { ...defaultData };
+  for (const idx in defaultData) {
+    mergedData[idx] = {
+      ...defaultData[idx],
+      ...(loadedData[idx] || {}), // keep any saved values
+    };
+  }
   appData.timerData = store?.timerData || {};
-  appData.workoutData = hasSaved ? store.workoutData : defaultData;
+  appData.workoutData = mergedData;
   appData.steps = store?.steps || 0;
 
   selectedDisplay.value = hasSaved ? 2 : 1;
 });
-
+console.log('App mounted with data:', appData, selectedWorkout.value, selectedDisplay.value);
 const isWorkoutComplete = computed(() => {
   const curr = appData.workoutData[selectedWorkout.value];
+  console.log('isWorkoutComplete check', curr);
   if (!curr) return false;
 
   return Object.values(curr).every(
@@ -57,12 +67,15 @@ function handleChangeDisplay(idx) {
 }
 
 function handleSelectWorkout(idx) {
+  console.log('Selected workout:', idx);
+
   selectedDisplay.value = 3; // Switch to Workout display
   selectedWorkout.value = idx;
+  console.log('Selected workout index:', selectedWorkout.value);
 }
 
 function handleSaveWorkout(value) {
-  appData.workoutData[selectedWorkout.value] = value
+  appData.workoutData[selectedWorkout.value] = value;
   updateAppData({ workoutData: appData.workoutData });
   //localStorage.setItem('workoutData', JSON.stringify(data.value));
 
@@ -110,9 +123,7 @@ function handleSaveSteps(value) {
       :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
       :selectedWorkout="selectedWorkout"
-       v-if="selectedDisplay === 3 
-        && selectedWorkout >= 0 
-        && appData.workoutData[selectedWorkout]"
+      v-if="selectedDisplay === 3 && selectedWorkout >= 0"
     />
     <!-- The Workout component will be displayed after the Dashboard component -->
   </Layouts>
