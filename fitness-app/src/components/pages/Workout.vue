@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch, reactive } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 
-
 const props = defineProps({
   handleSaveSteps: Function,
   handleSaveTimerData: Function,
@@ -15,7 +14,8 @@ const props = defineProps({
   handleSaveWorkout: Function,
 });
 const workoutTypes = ['push', 'pull', 'legs'];
-const { workout, warmup } = workoutProgram[selectedWorkout];
+const workout = computed(() => workoutProgram[props.selectedWorkout]?.workout || []);
+const warmup = computed(() => workoutProgram[props.selectedWorkout]?.warmup || []);
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 
@@ -30,36 +30,23 @@ let steps = ref(props.steps || 0);
 
 const data = reactive(props.workoutData || {});
 
+
 onMounted(() => {
-  let workoutData = props.workoutData || {};
-  let timerData = props.timerData || {};
-  console.log('Loaded workout data:', workoutData);
-  console.log('Loaded timer data:', timerData);
-  //const raw = localStorage.getItem('timerData');
+  const t = timers[props.selectedWorkout] || { time:0, minute:0, hour:0 };
+  time.value   = t.time;
+  minute.value = t.minute;
+  hour.value   = t.hour;
 
-  if (timerData) {
-    Object.assign(timers, timerData);
-    const savedTimer = timers[selectedWorkout];
-    if (savedTimer) {
-      time.value = savedTimer.time;
-      minute.value = savedTimer.minute;
-      hour.value = savedTimer.hour;
-    }
-  }
-  if (workoutData) {
-    data.value = workoutData;
-    selectedDisplay.value = 2;
-    steps.value = data.value[selectedWorkout]?.steps || 0;
-  }
+  steps.value = data[props.selectedWorkout]?.steps || 0;
 });
-
 watch(
-  () => selectedWorkout,
+  () => props.selectedWorkout,
   (idx) => {
     const saved = timers[idx] || { time: 0, minute: 0, hour: 0 };
     time.value = saved.time;
     minute.value = saved.minute;
     hour.value = saved.hour;
+    steps.value = data[idx]?.steps || 0;
   },
 
   { immediate: true }
@@ -110,7 +97,7 @@ function stopTimer() {
     timerId.value = null;
     console.log('Timer stopped at', time.value, 'seconds');
   }
-  timers[selectedWorkout] = {
+  timers[props.selectedWorkout] = {
     time: time.value,
     minute: minute.value,
     hour: hour.value,
@@ -124,9 +111,9 @@ const handleSkip = () => {
   console.log('Skipping workout');
 
   workout.forEach((exercise) => {
-    data[selectedWorkout][exercise.name].sets = 'skipped';
-    data[selectedWorkout][exercise.name].reps = 'skipped';
-    data[selectedWorkout][exercise.name].weight = 'skipped';
+    data[props.selectedWorkout][exercise.name].sets = 'skipped';
+    data[props.selectedWorkout][exercise.name].reps = 'skipped';
+    data[props.selectedWorkout][exercise.name].weight = 'skipped';
   });
   props.handleSaveWorkout(data.value);
 };
@@ -136,7 +123,7 @@ const saveSteps = () => {
     console.warn('Please enter a valid number of steps.');
     return;
   }
-  data[selectedWorkout].steps = steps.value;
+  data[props.selectedWorkout].steps = steps.value;
 
   props.handleSaveSteps(steps.value);
   //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
@@ -217,7 +204,7 @@ const saveSteps = () => {
         <i class="fa-solid fa-dumbbell"></i>
       </div>
 
-      <h2>{{ workoutTypes[selectedWorkout % 3] }} Workout</h2>
+      <h2>{{ workoutTypes[props.selectedWorkout % 3] }} Workout</h2>
       <button
         @click="
           () => {
@@ -226,9 +213,9 @@ const saveSteps = () => {
             s;
           }
         "
-        :disabled="workoutTypes[selectedWorkout % 3] === 'legs' ? false : true"
+        :disabled="workoutTypes[props.selectedWorkout % 3] === 'legs' ? false : true"
       >
-        {{ workoutTypes[selectedWorkout % 3] === 'legs' ? 'Steps Time?' : '' }}
+        {{ workoutTypes[props.selectedWorkout % 3] === 'legs' ? 'Steps Time?' : '' }}
       </button>
     </div>
     <div class="workout-grid">
@@ -273,17 +260,17 @@ const saveSteps = () => {
           </button>
         </div>
         <input
-          v-model="data[selectedWorkout][exercise.name].sets"
+          v-model="data[props.selectedWorkout][exercise.name].sets"
           type="text"
           :placeholder="exercise.sets + ' sets'"
         />
         <input
-          v-model="data[selectedWorkout][exercise.name].reps"
+          v-model="data[props.selectedWorkout][exercise.name].reps"
           type="text"
           :placeholder="exercise.reps + ' reps'"
         />
         <input
-          v-model="data[selectedWorkout][exercise.name].weight"
+          v-model="data[props.selectedWorkout][exercise.name].weight"
           class="grid-weights"
           type="text"
           placeholder="23Kg"

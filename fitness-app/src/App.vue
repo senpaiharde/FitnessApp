@@ -80,12 +80,14 @@ function handleRestPlan() {
   selectedDisplay.value = 1; // Switch back to Welcome display
   window.location.reload(); // Reload the page to reset the state
 }
-function handleSaveTimerData() {
-  updateAppData({ timerData: appData.timerData });
+function handleSaveTimerData(value) {
+    appData.timerData = value;
+  updateAppData({ timerData: value });
 }
 
-function handleSaveSteps() {
-  updateAppData({ steps: appData.steps });
+function handleSaveSteps(value) {
+    appData.steps = value;
+  updateAppData({ steps: value });
 }
 </script>
 
@@ -108,7 +110,7 @@ function handleSaveSteps() {
       :handleSaveTimerData="handleSaveTimerData"
       :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
-      :data="data"
+     
       :selectedWorkout="selectedWorkout"
       v-else-if="selectedDisplay == 3 && selectedWorkout >= 0"
       v-if="workoutProgram?.[selectedWorkout]"
