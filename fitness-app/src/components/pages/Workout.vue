@@ -28,18 +28,30 @@ let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
 let localSteps = ref(props.steps || 0);
+console.log(
+  'Workout component loaded with props:',
+  props.workoutData[props.selectedWorkout],
+  'Selected workout:',
+  props.selectedWorkout
+);
+const data = props.workoutData;
 
-const data =  props.workoutData;
-
-console.log('Workout data initialized:', data[props.selectedWorkout]);
 onMounted(() => {
+  const workout = data[props.selectedWorkout] || {};
+  if (workout) {
+    workout.forEach((key) => {
+      workout[key].sets;
+      workout[key].reps;
+      workout[key].weight;
+    });
+  }
   const t = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
-  time.value = t.time;
-  minute.value = t.minute;
-  hour.value = t.hour;
+  time.value = t.time || 0;
+  minute.value = t.minute || 0;
+  hour.value = t.hour || 0;
 
   localSteps.value = data[props.selectedWorkout]?.steps || 0;
-  console.log('DEBUG INIT', props.workoutData, props.selectedWorkout);
+  console.log('Mounted workout, preloaded values:', data[props.selectedWorkout]);
 });
 watch(
   () => props.selectedWorkout,
@@ -285,15 +297,14 @@ const saveSteps = () => {
       </div>
 
       <div class="card workout-btns">
-        <button
-          @click="() => 
-    
-        props.handleSaveWorkout(data[props.selectedWorkout])"
-        >
+        <button @click="() => props.handleSaveWorkout(data[props.selectedWorkout])">
           Save & Exit
           <i class="fa-solid fa-save"></i>
         </button>
-        <button :disabled="!props.isWorkoutComplete" @click="() => props.handleSaveWorkout(data[props.selectedWorkout])">
+        <button
+          :disabled="!props.isWorkoutComplete"
+          @click="() => props.handleSaveWorkout(data[props.selectedWorkout])"
+        >
           Complete
           <i class="fa-solid fa-check"></i>
         </button>

@@ -25,7 +25,7 @@ const appData = reactive({
 });
 onMounted(() => {
   // only enter the if block if we find some data saved to the key workouts in localstroage database
- const store = loadAppData() || {};
+  const store = loadAppData() || {};
   const loadedData = store.workoutData || {};
 
   // Ensure every workout index exists by merging defaults
@@ -37,8 +37,8 @@ onMounted(() => {
     };
   }
   appData.timerData = store?.timerData || {};
-  appData.workoutData = mergedData;
   appData.steps = store?.steps || 0;
+  appData.workoutData = mergedData;
 
   selectedDisplay.value = hasSaved ? 2 : 1;
 });
