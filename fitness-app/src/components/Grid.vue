@@ -7,7 +7,7 @@ const { handleSelectWorkout,firstInCompletedWorkoutIndex,handleRestPlan } = defi
   firstInCompletedWorkoutIndex: Number,
   handleRestPlan : Function,
 });
-console.log('Grid component loaded',handleRestPlan);
+console.log('Grid component loaded',handleRestPlan, handleSelectWorkout, firstInCompletedWorkoutIndex);
 </script>
 
 <template>

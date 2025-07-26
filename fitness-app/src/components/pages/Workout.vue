@@ -19,25 +19,29 @@ const warmup = computed(() => workoutProgram[props.selectedWorkout]?.warmup || [
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 
-const day = selectedWorkout + 1;
-
+const day = props.selectedWorkout + 1;
+console.log('Workout props:', {
+  timerData:      props.timerData,
+  workoutData:    props.workoutData,
+  selectedWorkout:props.selectedWorkout,
+  steps:          props.steps,
+});
 let timers = reactive(props.timerData || {});
 let time = ref(0);
 let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
-let steps = ref(props.steps || 0);
+let localSteps = ref(props.steps || 0);
 
 const data = reactive(props.workoutData || {});
 
-
 onMounted(() => {
-  const t = timers[props.selectedWorkout] || { time:0, minute:0, hour:0 };
-  time.value   = t.time;
+  const t = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
+  time.value = t.time;
   minute.value = t.minute;
-  hour.value   = t.hour;
+  hour.value = t.hour;
 
-  steps.value = data[props.selectedWorkout]?.steps || 0;
+  localSteps.value = data[props.selectedWorkout]?.steps || 0;
 });
 watch(
   () => props.selectedWorkout,
@@ -46,7 +50,7 @@ watch(
     time.value = saved.time;
     minute.value = saved.minute;
     hour.value = saved.hour;
-    steps.value = data[idx]?.steps || 0;
+    
   },
 
   { immediate: true }
@@ -81,11 +85,11 @@ function startTimer() {
     time.value++;
 
     if (time.value % 60 === 0) {
-      minute++; // increment minute every 60 seconds
+      minute.value++; // increment minute every 60 seconds
       time.value = 0;
     }
     if (minute === 60 && hour < 24) {
-      hour++; // increment hour every 60 minutes
+      hour.value++; // increment hour every 60 minutes
       minute.value = 0; // reset minute
     }
   }, 1000);
@@ -115,19 +119,19 @@ const handleSkip = () => {
     data[props.selectedWorkout][exercise.name].reps = 'skipped';
     data[props.selectedWorkout][exercise.name].weight = 'skipped';
   });
-  props.handleSaveWorkout(data.value);
+  props.handleSaveWorkout(data);
 };
 
 const saveSteps = () => {
-  if (steps.value < 1) {
+  if (localSteps.value < 1) {
     console.warn('Please enter a valid number of steps.');
     return;
   }
-  data[props.selectedWorkout].steps = steps.value;
+  data[props.selectedWorkout].steps = localSteps.value;
 
-  props.handleSaveSteps(steps.value);
+  props.handleSaveSteps(localSteps);
   //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
-  console.log(steps.value);
+  console.log(localSteps);
 };
 </script>
 <template>
@@ -160,12 +164,12 @@ const saveSteps = () => {
       <div class="exercise-image">
         <small>Steps</small>
         <p class="exercise-description">
-          {{ steps || 'No steps recorded for this workout.' }}
+          {{ localSteps || 'No steps recorded for this workout.' }}
         </p>
         <p class="exercise-description">
           while you Skipped the workout, you can add your steps here.
           <br />
-          <input v-model="steps" type="range" :range="(0, 20000)" min="0" max="20000" />
+          <input v-model="localSteps" type="range" :range="(0, 20000)" min="0" max="20000" />
         </p>
 
         <div class="exercise-btns">
@@ -210,7 +214,7 @@ const saveSteps = () => {
           () => {
             stepsPortal = true;
             handleSkip();
-            s;
+            
           }
         "
         :disabled="workoutTypes[props.selectedWorkout % 3] === 'legs' ? false : true"
