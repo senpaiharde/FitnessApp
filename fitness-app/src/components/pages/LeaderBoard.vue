@@ -9,6 +9,7 @@ const props = defineProps({
   firstInCompletedWorkoutIndex: Number,
 });
 const showStats = ref(true);
+const statsGrid = ref(null);
 const totalWorkouts = Object.keys(props.workoutData).length;
 const timeSpent = Object.values(props.timerData).reduce((acc, curr) => {
   return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
@@ -44,6 +45,22 @@ const workoutDisplay = [
       ].join(':') + ' minutes',
   },
 ];
+
+function enter(el) {
+  el.style.maxHeight = '0px';
+  el.style.overflow = 'hidden';
+  el.offsetHeight;
+  el.style.maxHeight = el.scrollHeight + 'px';
+  el.style.transition = 'max-height 0.5s ease';
+}
+
+function leave(el) {
+  el.style.maxHeight = el.scrollHeight + 'px';
+  el.offsetHeight;
+  el.style.maxHeight = '0px';
+  el.style.transition = 'max-height 0.5s ease';
+  el.style.overflow = 'hidden';
+}
 </script>
 
 <template>
@@ -55,8 +72,8 @@ const workoutDisplay = [
   </div>
 
   <!-- Collapsible Stats Grid -->
-  <transition name="slide-fade">
-    <section id="grid" v-show="showStats">
+  <transition @enter="enter" @leave="leave">
+    <section ref="stateGrid" id="grid" v-show="showStats">
       <div v-for="(item, idx) in workoutDisplay" :key="idx" class="row">
         <!-- Left 25% -->
         <div class="card-div plan-cardD">
@@ -99,19 +116,8 @@ const workoutDisplay = [
   border-radius: 4px;
 }
 
-/* Slide & Fade Animation */
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.5s ease;
-}
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
 #grid {
-  border: 1px solid var(--border-secondary);
+ 
   display: flex;
   flex-direction: column; /* stack rows vertically */
   gap: 1rem;
