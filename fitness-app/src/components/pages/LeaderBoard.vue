@@ -1,36 +1,59 @@
 <script setup>
+const props = defineProps({
+  selectedWorkout: Number,
+  steps: Number,
+  timerData: Object,
+  workoutData: Object,
+    firstInCompletedWorkoutIndex: Number,
+});
+const totalWorkouts = Object.keys(props.workoutData).length;
+const timeSpent = Object.values(props.timerData).reduce((acc, curr) => {
+  return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
+}, 0);
+const totalTimesSpend = {
+  hours: Math.floor(timeSpent / 3600),
+  minutes: Math.floor((timeSpent % 3600) / 60),
+  seconds: timeSpent % 60,
+};
+
 const workoutDisplay = [
-    {
-        workout : "Total Workouts",
-        classname : "card-icon fa-solid fa-dumbbell"
-    },
-    {
-        workout : "Total Steps",
-        classname :"card-icon fa-solid fa-weight-hanging"
-    },
-    {
-        workout : "Total Time",
-        classname :"card-icon fa-solid fa-bolt"
-    }
-]
+  {
+    workout: 'Total Workouts',
+    classname: 'card-icon fa-solid fa-dumbbell',
+    value: props.firstInCompletedWorkoutIndex + 1 + ' / ' + totalWorkouts,
+   
+  },
+  {
+    workout: 'Total Steps',
+    classname: 'card-icon fa-solid fa-weight-hanging',
+    value: props.steps.toLocaleString() + ' steps',
+  },
+  {
+    workout: 'Total Time',
+    classname: 'card-icon fa-solid fa-bolt',
+     value: [totalTimesSpend.hours, totalTimesSpend.minutes < 10 
+     ? '0' + totalTimesSpend.minutes : totalTimesSpend.minutes, totalTimesSpend.seconds 
+    < 10  ? '0' + totalTimesSpend.seconds : totalTimesSpend.seconds].join(':') + ' hrs', 
+  },
+];
+console.log('daddy', props.firstInCompletedWorkoutIndex)
 </script>
 
 <template>
   <section id="grid">
-    <div v-for="(workout, workoutIdx) in Object.keys(workoutDisplay)" :key="workoutIdx" class="row">
+    <div v-for="(item, idx) in workoutDisplay" :key="idx" class="row">
       <!-- Left 25% -->
       <div class="card-div plan-card">
         <div class="card">
-         
-            <p class="card-title">{{ workoutDisplay[workout].workout }}</p>
-            <i :class="workoutDisplay[workout].classname"></i>
+          <p class="card-title">{{ item.workout }}</p>
+          <i :class="item.classname"></i>
         </div>
       </div>
 
       <!-- Right 75% -->
       <div class="card-div plan-card-reset">
-        <p class="card-title">Rest / Totals for {{ workoutDisplay[workout] }}</p>
-        <i class="fa-solid fa-rotate-left"></i>
+        <p class="card-title">{{ item.value }}</p>
+        <i :class="item.classname"></i>
       </div>
     </div>
   </section>
@@ -53,8 +76,7 @@ const workoutDisplay = [
 .plan-card {
   display: flex;
   flex-direction: column;
-  background: #fafafa;
-  border: 1px solid #ddd;
+
   padding: 1rem;
 }
 
@@ -62,8 +84,7 @@ const workoutDisplay = [
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f3f3;
-  border: 1px solid #ddd;
+
   padding: 1rem;
 }
 </style>

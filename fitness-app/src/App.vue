@@ -130,7 +130,14 @@ function handleSaveSteps(value) {
     <!-- The Workout component will be displayed after the Dashboard component -->
 
    
-      <LeaderBoard v-if="selectedDisplay === 4" />
+      <LeaderBoard  
+      :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
+      
+      :selectedWorkout="selectedWorkout"
+      :steps="appData.steps"
+      :timerData="appData.timerData"
+      :workoutData="appData.workoutData"
+      v-if="selectedDisplay === 4" />
   </Layouts>
 </template>
 
