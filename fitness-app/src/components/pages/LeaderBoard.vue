@@ -88,13 +88,6 @@ function leave(el) {
           <i :class="item.classname"></i>
         </div>
       </div>
-      <div class="top-row">
-        <div class="card-div plan-cardD">
-          <div class="card">
-            <p class="card-title">Current Workout</p>
-          </div>
-        </div>
-      </div>
     </section>
   </transition>
   <sections id="Daddy"> </sections>
@@ -117,7 +110,6 @@ function leave(el) {
 }
 
 #grid {
- 
   display: flex;
   flex-direction: column; /* stack rows vertically */
   gap: 1rem;

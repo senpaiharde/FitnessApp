@@ -1,7 +1,32 @@
 <script setup>
+import { ref, Transition } from 'vue';
+
 const { handleChangeDisplay } = defineProps({
   handleChangeDisplay: Function,
 });
+
+const statsGrid = ref(null);
+const showStats = ref(true);
+function toggleStats() {
+  showStats.value = !showStats.value;
+}
+
+function enter(el) {
+  el.style.maxHeight = '0px';
+  el.style.overflow = 'hidden';
+  el.offsetHeight;
+  el.style.maxHeight = el.scrollHeight + 'px';
+  el.style.transition = 'max-height 0.5s ease';
+  
+}
+
+function leave(el) {
+  el.style.maxHeight = el.scrollHeight + 'px';
+  el.offsetHeight;
+  el.style.maxHeight = '0px';
+  el.style.transition = 'max-height 0.5s ease';
+  el.style.overflow = 'hidden';
+}
 </script>
 
 <template>
@@ -9,13 +34,38 @@ const { handleChangeDisplay } = defineProps({
     <div class="HeaderTop">
       <h1>Fitness App</h1>
       <div class="">
-        <button @click="() => handleChangeDisplay(4)">Dashboard</button>
-        <button @click="() => handleChangeDisplay(2)" class="HeaderButton">Workout</button>
+        <button
+          @click="
+            () => {
+              handleChangeDisplay(4);
+              toggleStats('dashboard');
+            }
+          "
+        >
+          Dashboard
+        </button>
+        <button
+          @click="
+            () => {
+              handleChangeDisplay(2);
+              toggleStats('workout');
+            }
+          "
+          class="HeaderButton"
+        >
+          Workout
+        </button>
       </div>
     </div>
   </header>
   <main>
-    <slot></slot>
+    <transition @enter="enter" @leave="leave">
+      <div v-if="showStats" class="garage-container">
+        <!-- This is where the main content will be rendered -->
+        <slot></slot>
+      </div>
+    </transition>
+
     <!-- This slot will render the Welcome component or any other content passed to Layouts -->`
   </main>
   <footer>
