@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch, reactive } from 'vue';
+import { computed, onMounted, ref, watch, reactive, toRef } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 
@@ -34,16 +34,15 @@ console.log(
   'Selected workout:',
   props.selectedWorkout
 );
-const data = props.workoutData;
 
+const reactiveData = toRef(props, 'workoutData');
+const data = computed(() => reactiveData.value);
 onMounted(() => {
   const workout = data[props.selectedWorkout] || {};
-  if (workout) {
-    workout.forEach((key) => {
-      workout[key].sets;
-      workout[key].reps;
-      workout[key].weight;
-    });
+  for (const key in workout) {
+    workout[key].sets;
+    workout[key].reps;
+    workout[key].weight;
   }
   const t = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
   time.value = t.time || 0;

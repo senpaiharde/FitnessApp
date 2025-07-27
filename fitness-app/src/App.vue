@@ -40,6 +40,7 @@ onMounted(() => {
   appData.steps = store?.steps || 0;
   appData.workoutData = mergedData;
 
+  const hasSaved = Object.keys(store).length > 0;
   selectedDisplay.value = hasSaved ? 2 : 1;
 });
 console.log('App mounted with data:', appData, selectedWorkout.value, selectedDisplay.value);
