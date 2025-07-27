@@ -13,6 +13,7 @@ const totalWorkouts = Object.keys(props.workoutData).length;
 const timeSpent = Object.values(props.timerData).reduce((acc, curr) => {
   return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
 }, 0);
+console.log('Total time spent in seconds:', showStats.value);
 const totalTimesSpend = {
   hours: Math.floor(timeSpent / 3600),
   minutes: Math.floor((timeSpent % 3600) / 60),
@@ -46,15 +47,16 @@ const workoutDisplay = [
 </script>
 
 <template>
+  <!-- Toggle Button -->
   <div class="toggle-bar">
-    <button @click="toggleStats" class="toggle-button">
-      <i class="fa-solid fa-bars"></i>
-      <span v-if="showStats">Hide Stats ▲</span>
-      <span v-else> Show Stats ▼</span>
+    <button @click="toggleStats">
+      {{ showStats ? 'Hide Stats ▲' : 'Show Stats ▼' }}
     </button>
   </div>
+
+  <!-- Collapsible Stats Grid -->
   <transition name="slide-fade">
-    <section id="grid">
+    <section id="grid" v-show="showStats">
       <div v-for="(item, idx) in workoutDisplay" :key="idx" class="row">
         <!-- Left 25% -->
         <div class="card-div plan-cardD">
@@ -100,7 +102,7 @@ const workoutDisplay = [
 /* Slide & Fade Animation */
 .slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 .slide-fade-enter-from,
 .slide-fade-leave-to {
