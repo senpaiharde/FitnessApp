@@ -6,6 +6,7 @@ import Workout from './components/pages/Workout.vue';
 import { ref, computed, onUnmounted, onMounted, reactive } from 'vue';
 import { workoutProgram } from './utils';
 import { loadAppData, removeAppdata, updateAppData } from './service/storage';
+import LeaderBoard from './components/pages/LeaderBoard.vue';
 const defaultData = {};
 for (let workoutIdx in workoutProgram) {
   const workoutData = workoutProgram[workoutIdx];
@@ -127,6 +128,9 @@ function handleSaveSteps(value) {
       v-if="selectedDisplay === 3 && selectedWorkout >= 0"
     />
     <!-- The Workout component will be displayed after the Dashboard component -->
+
+   
+      <LeaderBoard v-if="selectedDisplay === 4" />
   </Layouts>
 </template>
 

@@ -221,14 +221,16 @@ const saveSteps = () => {
         </div>
 
         <h2>{{ workoutTypes[props.selectedWorkout % 3] }} Workout</h2>
+        
         <button
+        v-if="workoutTypes[props.selectedWorkout % 3] === 'legs'"
           @click="
             () => {
               stepsPortal = true;
               handleSkip();
             }
           "
-          :disabled="workoutTypes[props.selectedWorkout % 3] === 'legs' ? false : true"
+          
         >
           {{ workoutTypes[props.selectedWorkout % 3] === 'legs' ? 'Steps Time?' : '' }}
         </button>

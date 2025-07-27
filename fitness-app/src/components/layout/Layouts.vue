@@ -9,7 +9,7 @@ const { handleChangeDisplay } = defineProps({
     <div class="HeaderTop">
       <h1>Fitness App</h1>
       <div class="">
-        <button>Dashboard</button>
+        <button @click="() => handleChangeDisplay(4)">Dashboard</button>
         <button @click="() => handleChangeDisplay(2)" class="HeaderButton">Workout</button>
       </div>
     </div>

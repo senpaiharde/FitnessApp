@@ -10,6 +10,7 @@ export function getUserId() {
     id = v4();
     localStorage.setItem('userId', id)
  }
+ return id;
 }
 
 
