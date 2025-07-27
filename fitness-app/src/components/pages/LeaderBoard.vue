@@ -4,7 +4,7 @@ const props = defineProps({
   steps: Number,
   timerData: Object,
   workoutData: Object,
-    firstInCompletedWorkoutIndex: Number,
+  firstInCompletedWorkoutIndex: Number,
 });
 const totalWorkouts = Object.keys(props.workoutData).length;
 const timeSpent = Object.values(props.timerData).reduce((acc, curr) => {
@@ -21,7 +21,6 @@ const workoutDisplay = [
     workout: 'Total Workouts',
     classname: 'card-icon fa-solid fa-dumbbell',
     value: props.firstInCompletedWorkoutIndex + 1 + ' / ' + totalWorkouts,
-   
   },
   {
     workout: 'Total Steps',
@@ -31,27 +30,29 @@ const workoutDisplay = [
   {
     workout: 'Total Time',
     classname: 'card-icon fa-solid fa-bolt',
-     value: [totalTimesSpend.hours, totalTimesSpend.minutes < 10 
-     ? '0' + totalTimesSpend.minutes : totalTimesSpend.minutes, totalTimesSpend.seconds 
-    < 10  ? '0' + totalTimesSpend.seconds : totalTimesSpend.seconds].join(':') + ' hrs', 
+    value:
+      [
+        totalTimesSpend.hours,
+        totalTimesSpend.minutes < 10 ? '0' + totalTimesSpend.minutes : totalTimesSpend.minutes,
+        totalTimesSpend.seconds < 10 ? '0' + totalTimesSpend.seconds : totalTimesSpend.seconds,
+      ].join(':') + ' hrs',
   },
 ];
-console.log('daddy', props.firstInCompletedWorkoutIndex)
+console.log('daddy', props.firstInCompletedWorkoutIndex);
 </script>
 
 <template>
   <section id="grid">
     <div v-for="(item, idx) in workoutDisplay" :key="idx" class="row">
       <!-- Left 25% -->
-      <div class="card-div plan-card">
+      <div class="card-div plan-cardD">
         <div class="card">
           <p class="card-title">{{ item.workout }}</p>
-          <i :class="item.classname"></i>
         </div>
       </div>
 
       <!-- Right 75% -->
-      <div class="card-div plan-card-reset">
+      <div class="card-div plan-card-resetT">
         <p class="card-title">{{ item.value }}</p>
         <i :class="item.classname"></i>
       </div>
@@ -67,24 +68,23 @@ console.log('daddy', props.firstInCompletedWorkoutIndex)
 }
 
 .row {
+  width: 100%;
   display: grid;
   grid-template-columns: 25% 75%; /* 2-column row */
   gap: 1rem;
   width: 100%;
 }
 
-.plan-card {
+.plan-cardD {
+  height: 60px;
   display: flex;
   flex-direction: column;
-
-  padding: 1rem;
 }
 
-.plan-card-reset {
+.plan-card-resetT {
+  height: 60px;
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  padding: 1rem;
+  justify-content: space-between;
 }
 </style>
