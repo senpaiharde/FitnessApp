@@ -1,5 +1,14 @@
 <script setup>
-import { useClerk, useUser } from '@clerk/vue';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUp,
+  useClerk,
+  UserButton,
+  useUser,
+  SignOutButton,
+} from '@clerk/vue';
 import { Transition, ref } from 'vue';
 
 const props = defineProps({
@@ -12,7 +21,7 @@ const props = defineProps({
 
 const { openSignIn, isSignedIn } = useClerk();
 const { user } = useUser();
-console.log('User data:', user, openSignIn, isSignedIn);
+console.log('User data:', user, 'isSignedIn:', isSignedIn);
 const showStats = ref(true);
 const statsGrid = ref(null);
 const totalWorkouts = Object.keys(props.workoutData).length;
@@ -101,7 +110,22 @@ const showFilter = ref(false);
   </transition>
   <sections id="Daddy">
     <div class="login-container">
-      <button v-if="!isSignedIn" @click="openSignIn()">Log in with Clerk</button>
+      <SignedOut>
+       
+        <SignInButton>Log in</SignInButton>
+      </SignedOut>
+
+      <SignedIn>
+       
+        <UserButton />
+
+       
+        <SignOutButton>Log out</SignOutButton>
+      </SignedIn>
+
+      <p>
+        {{ user ? 'Welcome, ' + user.firstName : 'Please sign in' }}
+      </p>
     </div>
   </sections>
 </template>
