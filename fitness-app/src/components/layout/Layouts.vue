@@ -1,31 +1,79 @@
 <script setup>
-import { ref, Transition } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 
-const { handleChangeDisplay } = defineProps({
+const props = defineProps({
   handleChangeDisplay: Function,
+  selectedDisplay: Number,
+  appData: Object,
 });
+const hasSaved = computed(() => {
+  return Object.keys(props.appData.workoutData).length > 0;
+});
+console.log('App mounted with data:', hasSaved.value, props.selectedDisplay);
+// start on Dashboard (2) if saved, otherwise Welcome (1)
+const activePage = ref(hasSaved.value ? 2 : 1);
+let isFirstLoad = true;
+onMounted(() => {
+  if (isFirstLoad) {
+    isFirstLoad = false;
+    activePage.value = props.selectedDisplay;
+  }
+});
+watch(
+  () => props.selectedDisplay,
+  (newPage) => {
+    if (hasSaved.value && newPage !== 1) {
+      // only animate for pages 2–4
 
-const statsGrid = ref(null);
-const showStats = ref(true);
-function toggleStats() {
-  showStats.value = !showStats.value;
+      const leaveDuration = 200;
+      activePage.value = null; // triggers leave animation
+      setTimeout(() => {
+        activePage.value = newPage; // triggers enter animation
+      }, leaveDuration);
+    } else {
+      activePage.value = newPage; // no animation for Welcome (1)
+    }
+  },
+  { immediate: true }
+);
+
+function getDuration(height) {
+  const baseHeight = 400;
+  const baseDuration = 500;
+  const maxDuration = 1000;
+  return Math.min(maxDuration, (height / baseHeight) * baseDuration);
 }
 
-function enter(el) {
-  el.style.maxHeight = '0px';
+function enter(el, done) {
+  const height = el.scrollHeight;
+  const duration = getDuration(height);
+
   el.style.overflow = 'hidden';
-  el.offsetHeight;
-  el.style.maxHeight = el.scrollHeight + 'px';
-  el.style.transition = 'max-height 0.5s ease';
-  
+
+  el.style.maxHeight = '0px';
+  el.style.transition = `max-height ${duration}ms ease`;
+
+  requestAnimationFrame(() => {
+    el.style.maxHeight = height + 'px';
+  });
+
+  setTimeout(done, duration);
 }
 
-function leave(el) {
-  el.style.maxHeight = el.scrollHeight + 'px';
-  el.offsetHeight;
-  el.style.maxHeight = '0px';
-  el.style.transition = 'max-height 0.5s ease';
+function leave(el, done) {
+  const height = el.scrollHeight;
+  const duration = getDuration(height);
+
   el.style.overflow = 'hidden';
+
+  el.style.maxHeight = height + 'px';
+  el.style.transition = `max-height ${duration}ms ease`;
+
+  requestAnimationFrame(() => {
+    el.style.maxHeight = '0px';
+  });
+
+  setTimeout(done, duration);
 }
 </script>
 
@@ -33,43 +81,24 @@ function leave(el) {
   <header>
     <div class="HeaderTop">
       <h1>Fitness App</h1>
-      <div class="">
-        <button
-          @click="
-            () => {
-              handleChangeDisplay(4);
-              toggleStats('dashboard');
-            }
-          "
-        >
-          Dashboard
-        </button>
-        <button
-          @click="
-            () => {
-              handleChangeDisplay(2);
-              toggleStats('workout');
-            }
-          "
-          class="HeaderButton"
-        >
-          Workout
-        </button>
+      <div>
+        <button @click="() => handleChangeDisplay(4)">Dashboard</button>
+        <button @click="() => handleChangeDisplay(2)" class="HeaderButton">Workout</button>
       </div>
     </div>
   </header>
+
   <main>
-    <transition @enter="enter" @leave="leave">
-      <div v-if="showStats" class="garage-container">
-        <!-- This is where the main content will be rendered -->
+    <!-- Animate using activePage instead of selectedDisplay directly -->
+    <transition @enter="enter" @leave="leave" mode="out-in">
+      <div v-if="activePage !== null" :key="activePage" class="garage-container">
         <slot></slot>
       </div>
     </transition>
-
-    <!-- This slot will render the Welcome component or any other content passed to Layouts -->`
   </main>
+
   <footer>
-    <small> Created by </small>
+    <small>Created by</small>
     <a href="https://github.com/senpaiharde" target="_blank">
       <img src="https://avatars.githubusercontent.com/u/66986422?v=4" alt="Logo" />
       <p>senpaiharde</p>

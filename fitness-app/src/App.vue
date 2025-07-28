@@ -44,7 +44,7 @@ onMounted(() => {
   const hasSaved = Object.keys(store).length > 0;
   selectedDisplay.value = hasSaved ? 2 : 1;
 });
-console.log('App mounted with data:', appData, selectedWorkout.value, selectedDisplay.value);
+
 const isWorkoutComplete = computed(() => {
   const curr = appData.workoutData[selectedWorkout.value];
   console.log('isWorkoutComplete check', curr);
@@ -103,10 +103,16 @@ function handleSaveSteps(value) {
   appData.steps = value;
   updateAppData({ steps: appData.steps });
 }
+
+
 </script>
 
 <template>
-  <Layouts :handleChangeDisplay="handleChangeDisplay">
+  <Layouts
+    :appData="appData"
+    :selectedDisplay="selectedDisplay"
+    :handleChangeDisplay="handleChangeDisplay"
+  >
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
     <!-- The Welcome component will be displayed first -->
     <Dashboard

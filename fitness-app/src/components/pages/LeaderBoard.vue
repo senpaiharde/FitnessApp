@@ -61,6 +61,14 @@ function leave(el) {
   el.style.transition = 'max-height 0.5s ease';
   el.style.overflow = 'hidden';
 }
+
+
+const periodOptions = [7,14,30,60,90,180,365];
+const period = ref(30); // Default to 30 days
+const showFilter = ref(false);
+
+
+
 </script>
 
 <template>
