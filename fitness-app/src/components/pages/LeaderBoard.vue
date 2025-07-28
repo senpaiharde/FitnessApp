@@ -1,4 +1,5 @@
 <script setup>
+import { useClerk, useUser } from '@clerk/vue';
 import { Transition, ref } from 'vue';
 
 const props = defineProps({
@@ -8,6 +9,10 @@ const props = defineProps({
   workoutData: Object,
   firstInCompletedWorkoutIndex: Number,
 });
+
+const { openSignIn, isSignedIn } = useClerk();
+const { user } = useUser();
+console.log('User data:', user, openSignIn, isSignedIn);
 const showStats = ref(true);
 const statsGrid = ref(null);
 const totalWorkouts = Object.keys(props.workoutData).length;
@@ -62,13 +67,9 @@ function leave(el) {
   el.style.overflow = 'hidden';
 }
 
-
-const periodOptions = [7,14,30,60,90,180,365];
+const periodOptions = [7, 14, 30, 60, 90, 180, 365];
 const period = ref(30); // Default to 30 days
 const showFilter = ref(false);
-
-
-
 </script>
 
 <template>
@@ -98,7 +99,11 @@ const showFilter = ref(false);
       </div>
     </section>
   </transition>
-  <sections id="Daddy"> </sections>
+  <sections id="Daddy">
+    <div class="login-container">
+      <button v-if="!isSignedIn" @click="openSignIn()">Log in with Clerk</button>
+    </div>
+  </sections>
 </template>
 
 <style scoped>
