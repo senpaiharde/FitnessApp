@@ -4,38 +4,40 @@ interface AppData {
   workoutData: Record<string, any>; // or your specific workout shape
   steps: number;
 }
-
+const STORAGE_KEY = (uid) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
 const USER_KEY = 'userId';
 export function getUserId() {
   let id = localStorage.getItem(USER_KEY);
   if (id) return id;
+  let anonId = localStorage.getItem(ANON_KEY);
   if (!id) {
-    id = v4();
-    localStorage.setItem(ANON_KEY, id);
+    anonId = v4();
+    localStorage.setItem(ANON_KEY, anonId);
   }
   return id;
 }
 
 export function setSignedInUser(clerkUserId: string) {
   const anon = localStorage.getItem(ANON_KEY);
+
+  console.log('Setting signed-in user:', clerkUserId, 'from anon:', anon);
   if (anon) {
-    const oldKey = `appdata_${anon}`;
-    
-    const raw = localStorage.getItem(oldKey);
+    const oldKey = `appData_${anon}`;
+    console.log('Migrating data from old key:', oldKey);
+    const raw = localStorage.getItem(`appData_${anon}`);
+    console.log('Raw data found:', raw);
     if (raw) {
       localStorage.setItem(`appData_${clerkUserId}`, raw);
       localStorage.removeItem(oldKey);
     }
-
   }
   localStorage.setItem(USER_KEY, clerkUserId);
 }
 
-const STORAGE_KEY = (uid) => `appData_${uid}`;
-
 export function loadAppData(): AppData {
   const uid = getUserId();
+  console.log('Loading app data for user:', uid);
   const raw = localStorage.getItem(STORAGE_KEY(uid));
 
   return raw ? (JSON.parse(raw) as AppData) : { timerData: null, workoutData: {}, steps: 0 };

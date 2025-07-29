@@ -42,18 +42,21 @@ watch(
   () => user.value,
   (newUser) => {
     if (newUser) {
-      console.log('🎉 Clerk user object just arrived:', newUser);
-      console.log('→ user.id =', newUser.id);
-      console.log('→ user.firstName =', newUser.firstName);
+      console.log('🎉 Clerk user object just arrived:', newUser || 'No ID found')  ;
+      console.log('→ user.id =', newUser.id || 'No ID found');
+      console.log('→ user.firstName =', newUser.firstName || 'No ID found');
     }
   },
   { immediate: true }
 );
 watch(
-  () => user['value'].id,
+  () => user['value']?.id,
   (newId, oldId) => {
-    if (newId && newId !== oldId) {
+    console.log('User ID changed:', oldId, '→', newId);
+    if (newId) {
       setSignedInUser(newId);
+    } else {
+      setSignedInUser(null);
     }
   },
   { immediate: true }
@@ -131,8 +134,17 @@ const showFilter = ref(false);
   </transition>
   <section id="daddy">
     <div class="button-container">
-      <button @click="showFilter = !showFilter">
-        {{ showFilter ? 'Hide Filter' : 'Show Filter' }}
+      <button >
+       Workouts TOP
+      </button>
+      <button >
+        Steps TOP
+      </button>
+      <button >
+         Time Waster
+      </button>
+      <button >
+        Steps TOP
       </button>
     </div>
     <div class="login-container">
@@ -164,6 +176,7 @@ const showFilter = ref(false);
   clear: both;
 }
 .button-container {
+    gap: 0.5rem;
   display: flex;
   justify-content: center;
   margin: 1rem;
