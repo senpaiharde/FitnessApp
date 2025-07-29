@@ -9,7 +9,8 @@ import {
   useUser,
   SignOutButton,
 } from '@clerk/vue';
-import { Transition, ref } from 'vue';
+import { Transition, ref, watch } from 'vue';
+import { setSignedInUser } from '../../service/storage';
 
 const props = defineProps({
   selectedWorkout: Number,
@@ -21,7 +22,7 @@ const props = defineProps({
 
 const { openSignIn, isSignedIn } = useClerk();
 const { user } = useUser();
-console.log('User data:', user, 'isSignedIn:', isSignedIn);
+
 const showStats = ref(true);
 const statsGrid = ref(null);
 const totalWorkouts = Object.keys(props.workoutData).length;
@@ -37,6 +38,26 @@ const totalTimesSpend = {
 function toggleStats() {
   showStats.value = !showStats.value;
 }
+watch(
+  () => user.value,
+  (newUser) => {
+    if (newUser) {
+      console.log('🎉 Clerk user object just arrived:', newUser);
+      console.log('→ user.id =', newUser.id);
+      console.log('→ user.firstName =', newUser.firstName);
+    }
+  },
+  { immediate: true }
+);
+watch(
+  () => user['value'].id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      setSignedInUser(newId);
+    }
+  },
+  { immediate: true }
+);
 const workoutDisplay = [
   {
     workout: 'Total Workouts',
@@ -108,18 +129,20 @@ const showFilter = ref(false);
       </div>
     </section>
   </transition>
-  <sections id="Daddy">
+  <section id="daddy">
+    <div class="button-container">
+      <button @click="showFilter = !showFilter">
+        {{ showFilter ? 'Hide Filter' : 'Show Filter' }}
+      </button>
+    </div>
     <div class="login-container">
       <SignedOut>
-       
         <SignInButton>Log in</SignInButton>
       </SignedOut>
 
       <SignedIn>
-       
         <UserButton />
 
-       
         <SignOutButton>Log out</SignOutButton>
       </SignedIn>
 
@@ -127,10 +150,25 @@ const showFilter = ref(false);
         {{ user ? 'Welcome, ' + user.firstName : 'Please sign in' }}
       </p>
     </div>
-  </sections>
+  </section>
 </template>
 
 <style scoped>
+#daddy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+  clear: both;
+}
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem;
+  justify-content: space-between;
+}
 .toggle-bar {
   display: flex;
   justify-content: center;
