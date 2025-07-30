@@ -4,6 +4,9 @@ interface AppData {
   workoutData: Record<string, any>; // or your specific workout shape
   steps: number;
   completedCount: number;
+   stepHistory?:     Record<string, number>;
+  workoutHistory?:  Record<string, number>;
+  timeHistory?:     Record<string, number>;
 }
 const STORAGE_KEY = (uid) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
@@ -44,7 +47,15 @@ export function loadAppData(): AppData {
 
   return raw
     ? (JSON.parse(raw) as AppData)
-    : { timerData: null, workoutData: {}, steps: 0, completedCount: 0 };
+    : {
+        timerData: null,
+        workoutData: {},
+        steps: 0,
+        completedCount: 0,
+        stepHistory: {},
+        workoutHistory: {},
+        timeHistory: {},
+      };
 }
 
 export function saveAppData(data: AppData) {

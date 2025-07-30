@@ -25,6 +25,9 @@ const appData = reactive({
   workoutData: defaultData,
   steps: 0,
   completedCount: 0,
+  stepHistory: {},
+  workoutHistory: {},
+  timeHistory: {},
 });
 onMounted(() => {
   // only enter the if block if we find some data saved to the key workouts in localstroage database
@@ -78,7 +81,19 @@ function handleSelectWorkout(idx) {
   console.log('Selected workout index:', selectedWorkout.value);
 }
 
+
+// save the current date in ISO format
+const today = formatISO(new Date(), { representation: 'date' });
+const data = loadAppData();
+
+
 function handleSaveWorkout(value) {
+
+  const workoutHistory = data.workoutHistory || {};
+    workoutHistory[today] = value;
+    appData.workoutHistory = workoutHistory;
+    updateAppData({ workoutHistory: appData.workoutHistory });
+    
   appData.workoutData[selectedWorkout.value] = value;
   updateAppData({ workoutData: appData.workoutData });
   appData.completedCount++;
@@ -90,6 +105,7 @@ function handleSaveWorkout(value) {
   selectedWorkout.value = -1; // Reset selected workout
 }
 
+
 function handleRestPlan() {
   removeAppdata();
   appData.workoutData = defaultData; // Reset workout data
@@ -100,13 +116,30 @@ function handleRestPlan() {
   window.location.reload(); // Reload the page to reset the state
 }
 function handleSaveTimerData(value) {
+   
   appData.timerData = value;
+
   updateAppData({ timerData: appData.timerData });
+
+  const timerHistory = data.timeHistory || {};
+  timerHistory[today] = value;
+  appData.timeHistory = timerHistory;
+  updateAppData({ timeHistory: appData.timeHistory });
+
+
 }
 
 function handleSaveSteps(value) {
+    
+    
   appData.steps = value;
   updateAppData({ steps: appData.steps });
+
+
+const stepHistory = data.stepHistory || {};
+  stepHistory[today] = value;
+  appData.stepHistory = stepHistory;
+  updateAppData({ stepHistory: appData.stepHistory });
 }
 </script>
 
