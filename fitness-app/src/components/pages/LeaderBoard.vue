@@ -10,7 +10,7 @@ import {
   SignOutButton,
 } from '@clerk/vue';
 import { Transition, ref, watch } from 'vue';
-import { setSignedInUser } from '../../service/storage';
+import { loadAllAppData, setSignedInUser } from '../../service/storage';
 import DataPicker from '../../service/DataPicker.vue';
 
 const props = defineProps({
@@ -90,6 +90,41 @@ function leave(el) {
   el.style.transition = 'max-height 0.5s ease';
   el.style.overflow = 'hidden';
 }
+const topUsers = ref([]);
+
+console.log('yesdaddy', JSON.parse(localStorage.getItem('allAppData')));
+
+function buildLeaderboard() {
+  const all = loadAllAppData();
+  const board = Object.entries(all).map(([uid, data]) => ({
+    userId: uid,
+    name: uid === user.value?.id ? user.value.firstName : 'Anonymous',
+    totalSteps: data.steps,
+    totalWorkouts: data.workoutData ? Object.keys(data.workoutData).length : 0,
+    timeSpent: Object.values(data.timerData || {}).reduce(
+      (sum, e) => sum + (e.time || 0) + (e.minute || 0) * 60 + (e.hour || 0) * 3600,
+      0
+    ),
+  }));
+  // sort & slice
+  const sorted = board.sort((a, b) => b.totalSteps - a.totalSteps).slice(0, 10);
+  topUsers.value = sorted;
+  return sorted;
+}
+
+const board = buildLeaderboard();
+console.log('board', board);
+console.log('topUsers', topUsers.value);
+
+watch(
+  () => user.value?.id,
+  (newId) => {
+    if (newId) {
+      buildLeaderboard();
+    }
+  },
+  { immediate: true }
+);
 
 const selectedRange = ref(30);
 </script>
@@ -129,7 +164,16 @@ const selectedRange = ref(30);
       <button>Steps TOP</button>
       <DataPicker
         v-model="selectedRange"
-        :options="['7 days','', '14 days', '30 days', '60 days', '90 days', '180 days', '360 days']"
+        :options="[
+          '7 days',
+          '',
+          '14 days',
+          '30 days',
+          '60 days',
+          '90 days',
+          '180 days',
+          '360 days',
+        ]"
         width="120px"
         height="36px"
       />
