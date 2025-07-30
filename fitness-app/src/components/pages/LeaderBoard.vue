@@ -42,7 +42,7 @@ watch(
   () => user.value,
   (newUser) => {
     if (newUser) {
-      console.log('🎉 Clerk user object just arrived:', newUser || 'No ID found')  ;
+      console.log('🎉 Clerk user object just arrived:', newUser || 'No ID found');
       console.log('→ user.id =', newUser.id || 'No ID found');
       console.log('→ user.firstName =', newUser.firstName || 'No ID found');
     }
@@ -100,9 +100,7 @@ function leave(el) {
   el.style.overflow = 'hidden';
 }
 
-const periodOptions = [7, 14, 30, 60, 90, 180, 365];
-const period = ref(30); // Default to 30 days
-const showFilter = ref(false);
+const selectedRange = ref(null);
 </script>
 
 <template>
@@ -134,18 +132,15 @@ const showFilter = ref(false);
   </transition>
   <section id="daddy">
     <div class="button-container">
-      <button >
-       Workouts TOP
-      </button>
-      <button >
-        Steps TOP
-      </button>
-      <button >
-         Time Waster
-      </button>
-      <button >
-        Steps TOP
-      </button>
+      <button>Workouts TOP</button>
+      <button>Steps TOP</button>
+      <button>Time Waster</button>
+      <button>Steps TOP</button>
+      <div v-for="(item, idx) in ChooseButton" :key="idx" class="chooseButton">
+        <button @click="period = item.value">
+          {{ item.label }}
+        </button>
+      </div>
     </div>
     <div class="login-container">
       <SignedOut>
@@ -166,6 +161,7 @@ const showFilter = ref(false);
 </template>
 
 <style scoped>
+
 #daddy {
   display: flex;
   flex-direction: column;
@@ -176,7 +172,7 @@ const showFilter = ref(false);
   clear: both;
 }
 .button-container {
-    gap: 0.5rem;
+  gap: 0.5rem;
   display: flex;
   justify-content: center;
   margin: 1rem;
