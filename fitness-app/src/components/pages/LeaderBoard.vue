@@ -11,6 +11,7 @@ import {
 } from '@clerk/vue';
 import { Transition, ref, watch } from 'vue';
 import { setSignedInUser } from '../../service/storage';
+import DataPicker from '../../service/DataPicker.vue';
 
 const props = defineProps({
   selectedWorkout: Number,
@@ -29,7 +30,7 @@ const totalWorkouts = Object.keys(props.workoutData).length;
 const timeSpent = Object.values(props.timerData).reduce((acc, curr) => {
   return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
 }, 0);
-console.log('Total time spent in seconds:', showStats.value);
+
 const totalTimesSpend = {
   hours: Math.floor(timeSpent / 3600),
   minutes: Math.floor((timeSpent % 3600) / 60),
@@ -38,17 +39,7 @@ const totalTimesSpend = {
 function toggleStats() {
   showStats.value = !showStats.value;
 }
-watch(
-  () => user.value,
-  (newUser) => {
-    if (newUser) {
-      console.log('🎉 Clerk user object just arrived:', newUser || 'No ID found');
-      console.log('→ user.id =', newUser.id || 'No ID found');
-      console.log('→ user.firstName =', newUser.firstName || 'No ID found');
-    }
-  },
-  { immediate: true }
-);
+
 watch(
   () => user['value']?.id,
   (newId, oldId) => {
@@ -100,7 +91,7 @@ function leave(el) {
   el.style.overflow = 'hidden';
 }
 
-const selectedRange = ref(null);
+const selectedRange = ref(30);
 </script>
 
 <template>
@@ -136,11 +127,12 @@ const selectedRange = ref(null);
       <button>Steps TOP</button>
       <button>Time Waster</button>
       <button>Steps TOP</button>
-      <div v-for="(item, idx) in ChooseButton" :key="idx" class="chooseButton">
-        <button @click="period = item.value">
-          {{ item.label }}
-        </button>
-      </div>
+      <DataPicker
+        v-model="selectedRange"
+        :options="['7 days','', '14 days', '30 days', '60 days', '90 days', '180 days', '360 days']"
+        width="120px"
+        height="36px"
+      />
     </div>
     <div class="login-container">
       <SignedOut>
@@ -161,7 +153,6 @@ const selectedRange = ref(null);
 </template>
 
 <style scoped>
-
 #daddy {
   display: flex;
   flex-direction: column;

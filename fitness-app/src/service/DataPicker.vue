@@ -1,108 +1,143 @@
-<!-- components/DataPicker.vue -->
 <template>
-  <div class="data-picker" ref="picker" :style="pickerStyle">
-    <!-- visible box -->
-    <div class="picker-box" @click="toggle">
-      {{ displayText }}
-      <span class="arrow">▼</span>
-    </div>
-
-    <!-- dropdown list -->
-    <div v-if="open" class="dropdown">
-      <div
-        v-for="(opt, i) in options"
-        :key="i"
-        class="dropdown-item"
-        @click="select(opt)"
-      >
-        {{ opt }}
-      </div>
+  <div
+    class="data-picker"
+    ref="picker"
+    :style="pickerStyle"
+    @mousedown.prevent="onDragStart"
+    @mousemove.prevent="onDrag"
+    @mouseup.prevent="onDragEnd"
+    @mouseleave.prevent="onDragEnd"
+  >
+    <div
+      v-for="(opt, i) in repeatedOptions"
+      :key="i"
+      class="picker-item"
+      :class="{ selected: opt === modelValue }"
+      @click="select(opt)"
+    >
+      {{ opt }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
 
 const props = defineProps({
-  options:    { type: Array, required: true },
+  options: { type: Array, required: true },
   modelValue: { type: [String, Number], default: null },
-  width:      { type: String, default: '200px' },
-  height:     { type: String, default: '40px' },
+  width: { type: String, default: '200px' },
+  height: { type: String, default: '40px' },
 });
 const emit = defineEmits(['update:modelValue']);
-const open = ref(false);
 const picker = ref(null);
 
-// toggle dropdown
-function toggle() {
-  open.value = !open.value;
-}
-// choose an item
+// 3× repetition for infinite scroll
+const repeatedOptions = computed(() => [...props.options, ...props.options, ...props.options]);
+
 function select(opt) {
   emit('update:modelValue', opt);
-  open.value = false;
 }
-// text shown in the box
-const displayText = computed(() =>
-  props.modelValue != null ? props.modelValue : 'Select…'
-);
 
-// click-outside closes
-function onClickOutside(e) {
-  if (picker.value && !picker.value.contains(e.target)) {
-    open.value = false;
+// drag-scrolling
+let isDragging = false,
+  startY = 0,
+  startScroll = 0;
+function onDragStart(e) {
+  isDragging = true;
+  startY = e.clientY;
+  startScroll = picker.value.scrollTop;
+}
+function onDrag(e) {
+  if (!isDragging) return;
+  picker.value.scrollTop = startScroll - (e.clientY - startY);
+}
+function onDragEnd() {
+  isDragging = false;
+}
+
+// measurements
+let itemHeight = 0,
+  blockHeight = 0,
+  lowThreshold = 0,
+  highThreshold = 0;
+
+function onScroll() {
+  const c = picker.value;
+  const items = c.querySelectorAll('.picker-item');
+  const rect = c.getBoundingClientRect();
+  const midY = rect.top + rect.height / 2;
+
+  // 3D tilt effect
+  items.forEach((el) => {
+    const r = el.getBoundingClientRect();
+    const offset = (r.top + r.height / 2 - midY) / (rect.height / 2);
+    el.style.transform = `rotateX(${offset * 30}deg)`;
+  });
+
+  // infinite-wrap when beyond thresholds
+  const st = c.scrollTop;
+  if (st < lowThreshold) {
+    c.scrollTop += blockHeight;
+  } else if (st > highThreshold) {
+    c.scrollTop -= blockHeight;
   }
 }
-onMounted(() => document.addEventListener('click', onClickOutside));
-onBeforeUnmount(() => document.removeEventListener('click', onClickOutside));
 
-// inline style for sizing
+onMounted(() => {
+  nextTick(() => {
+    const el = picker.value.querySelector('.picker-item');
+    if (el) {
+      itemHeight = el.offsetHeight;
+      blockHeight = itemHeight * props.options.length;
+      // require scrolling past half a block before wrap
+      const margin = blockHeight / 2;
+      lowThreshold = blockHeight - margin; // = blockHeight/2
+      highThreshold = blockHeight * 2 - margin; // = blockHeight*1.5
+      // start in the middle block
+      picker.value.scrollTop = blockHeight;
+    }
+    picker.value.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  });
+});
+
+onBeforeUnmount(() => {
+  picker.value.removeEventListener('scroll', onScroll);
+});
+
 const pickerStyle = computed(() => ({
   width: props.width,
-  '--dp-height': props.height
+  height: props.height,
+  overflowY: 'auto',
+  scrollbarWidth: 'none',
+  msOverflowStyle: 'none',
+  perspective: '500px',
 }));
 </script>
 
 <style scoped>
 .data-picker {
   position: relative;
-  font-family: sans-serif;
-}
-.picker-box {
-  height: var(--dp-height);
-  line-height: var(--dp-height);
-  padding: 0 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-.arrow {
-  margin-left: 0.5rem;
-  font-size: 0.8em;
-}
-.dropdown {
-  position: absolute;
-  top: calc(var(--dp-height) + 4px);
-  left: 0;
-  width: 100%;
-  max-height: 200px;
   overflow-y: auto;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  z-index: 10;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
-.dropdown-item {
+.data-picker::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.picker-item {
   padding: 0.5rem;
   cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  transform-origin: center center;
+  backface-visibility: hidden;
 }
-.dropdown-item:hover {
-  background: #f5f5f5;
+
+.picker-item.selected {
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
 }
 </style>

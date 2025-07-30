@@ -7,6 +7,7 @@ interface AppData {
 const STORAGE_KEY = (uid) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
 const USER_KEY = 'userId';
+const ALL_DATA_KEY = 'allAppData';
 export function getUserId() {
   let id = localStorage.getItem(USER_KEY);
   if (id) return id;
@@ -24,12 +25,12 @@ export function setSignedInUser(clerkUserId: string) {
   console.log('Setting signed-in user:', clerkUserId, 'from anon:', anon);
   if (anon) {
     const oldKey = `appData_${anon}`;
-    console.log('Migrating data from old key:', oldKey);
+
     const raw = localStorage.getItem(`appData_${anon}`);
-    console.log('Raw data found:', raw);
+
     if (raw) {
       localStorage.setItem(`appData_${clerkUserId}`, raw);
-      localStorage.removeItem(oldKey);
+      localStorage.removeItem(ANON_KEY);
     }
   }
   localStorage.setItem(USER_KEY, clerkUserId);
@@ -57,4 +58,15 @@ export function updateAppData(patch: Partial<AppData>) {
 export function removeAppdata() {
   const uid = getUserId();
   localStorage.removeItem(STORAGE_KEY(uid));
+}
+
+export function updateAllUserData() {
+  const uid: any = getUserId();
+  const all = loadAllAppData();
+  all[uid] = loadAppData();
+  localStorage.setItem(ALL_DATA_KEY, JSON.stringify(all));
+}
+
+export function loadAllAppData() {
+  return JSON.parse(localStorage.getItem(ALL_DATA_KEY) || '{}');
 }
