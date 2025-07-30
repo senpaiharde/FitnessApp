@@ -3,7 +3,7 @@ interface AppData {
   timerData: Record<number, { time: number; minute: number; hour: number }> | null;
   workoutData: Record<string, any>; // or your specific workout shape
   steps: number;
-   completedCount:  number;
+  completedCount: number;
 }
 const STORAGE_KEY = (uid) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
@@ -42,12 +42,15 @@ export function loadAppData(): AppData {
   console.log('Loading app data for user:', uid);
   const raw = localStorage.getItem(STORAGE_KEY(uid));
 
-  return raw ? (JSON.parse(raw) as AppData) : { timerData: null, workoutData: {}, steps: 0 , completedCount: 0};
+  return raw
+    ? (JSON.parse(raw) as AppData)
+    : { timerData: null, workoutData: {}, steps: 0, completedCount: 0 };
 }
 
 export function saveAppData(data: AppData) {
   const uid = getUserId();
   localStorage.setItem(STORAGE_KEY(uid), JSON.stringify(data));
+  updateAllUserData();
 }
 
 export function updateAppData(patch: Partial<AppData>) {

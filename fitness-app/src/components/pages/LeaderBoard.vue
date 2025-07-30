@@ -100,7 +100,7 @@ function buildLeaderboard() {
     userId: uid,
     name: uid === user.value?.id ? user.value.firstName : 'Anonymous',
     totalSteps: data.steps,
-    totalWorkouts:  data.completedCount,
+    totalWorkouts:  data.completedCount + 1,
     
     timeSpent: Object.values(data.timerData || {}).reduce(
       (sum, e) => sum + (e.time || 0) + (e.minute || 0) * 60 + (e.hour || 0) * 3600,
@@ -127,7 +127,35 @@ watch(
   { immediate: true }
 );
 
+
 const selectedRange = ref(30);
+
+const displayRange = computed(() => {
+  switch (selectedRange.value) {
+    case 7:
+      return 'Last 7 days';
+    case 14:
+      return 'Last 14 days';
+    case 30:
+      return 'Last 30 days';
+    case 60:
+      return 'Last 60 days';
+    case 90:
+      return 'Last 90 days';
+    case 180:
+      return 'Last 180 days';
+    case 360:
+      return 'Last 360 days';
+    default:
+      return '';
+  }
+
+});
+
+boardDisplay = computed(() => {
+    
+})
+
 </script>
 
 <template>
