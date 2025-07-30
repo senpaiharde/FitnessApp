@@ -9,9 +9,10 @@ import {
   useUser,
   SignOutButton,
 } from '@clerk/vue';
-import { Transition, ref, watch } from 'vue';
+import { Transition, ref, watch, computed } from 'vue';
 import { loadAllAppData, setSignedInUser } from '../../service/storage';
 import DataPicker from '../../service/DataPicker.vue';
+import { buildLeaderboard, enter, leave, WorkoutDataDisplay } from '../../utils/code';
 
 const props = defineProps({
   selectedWorkout: Number,
@@ -27,18 +28,6 @@ const { user } = useUser();
 const showStats = ref(true);
 const statsGrid = ref(null);
 const totalWorkouts = Object.keys(props.workoutData).length;
-const timeSpent = Object.values(props.timerData).reduce((acc, curr) => {
-  return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
-}, 0);
-
-const totalTimesSpend = {
-  hours: Math.floor(timeSpent / 3600),
-  minutes: Math.floor((timeSpent % 3600) / 60),
-  seconds: timeSpent % 60,
-};
-function toggleStats() {
-  showStats.value = !showStats.value;
-}
 
 watch(
   () => user['value']?.id,
@@ -52,68 +41,22 @@ watch(
   },
   { immediate: true }
 );
-const workoutDisplay = [
-  {
-    workout: 'Total Workouts',
-    classname: 'card-icon fa-solid fa-dumbbell',
-    value: props.firstInCompletedWorkoutIndex + 1 + ' / ' + totalWorkouts,
-  },
-  {
-    workout: 'Total Steps',
-    classname: 'card-icon fa-solid fa-weight-hanging',
-    value: props.steps.toLocaleString() + ' steps',
-  },
-  {
-    workout: 'Total Time',
-    classname: 'card-icon fa-solid fa-bolt',
-    value:
-      [
-        totalTimesSpend.hours,
-        totalTimesSpend.minutes < 10 ? '0' + totalTimesSpend.minutes : totalTimesSpend.minutes,
-        totalTimesSpend.seconds < 10 ? '0' + totalTimesSpend.seconds : totalTimesSpend.seconds,
-      ].join(':') + ' minutes',
-  },
-];
 
-function enter(el) {
-  el.style.maxHeight = '0px';
-  el.style.overflow = 'hidden';
-  el.offsetHeight;
-  el.style.maxHeight = el.scrollHeight + 'px';
-  el.style.transition = 'max-height 0.5s ease';
-}
+const workoutDisplay = WorkoutDataDisplay({
+  workoutData: props.workoutData,
+  firstInCompletedWorkoutIndex: props.firstInCompletedWorkoutIndex,
+  timerData: props.timerData,
+  steps: props.steps,
+  completedCount: props.completedCount,
+});
 
-function leave(el) {
-  el.style.maxHeight = el.scrollHeight + 'px';
-  el.offsetHeight;
-  el.style.maxHeight = '0px';
-  el.style.transition = 'max-height 0.5s ease';
-  el.style.overflow = 'hidden';
-}
+
+
 const topUsers = ref([]);
 
 console.log('yesdaddy', JSON.parse(localStorage.getItem('allAppData')));
 
-function buildLeaderboard() {
-  const all = loadAllAppData();
-  const board = Object.entries(all).map(([uid, data]) => ({
-    userId: uid,
-    name: uid === user.value?.id ? user.value.firstName : 'Anonymous',
-    totalSteps: data.steps,
-    totalWorkouts:  data.completedCount + 1,
-    
-    timeSpent: Object.values(data.timerData || {}).reduce(
-      (sum, e) => sum + (e.time || 0) + (e.minute || 0) * 60 + (e.hour || 0) * 3600,
-      0
-    ),
-  }));
-  // sort & slice
-  const sorted = board.sort((a, b) => b.totalSteps - a.totalSteps).slice(0, 10);
-  topUsers.value = sorted;
-  return sorted;
-}
-
-const board = buildLeaderboard();
+const board = buildLeaderboard(user, 10);
 console.log('board', board);
 console.log('topUsers', topUsers.value);
 
@@ -121,41 +64,14 @@ watch(
   () => user.value?.id,
   (newId) => {
     if (newId) {
-      buildLeaderboard();
+      const slava = buildLeaderboard(user);
+      topUsers.value = slava;
     }
   },
   { immediate: true }
 );
 
-
 const selectedRange = ref(30);
-
-const displayRange = computed(() => {
-  switch (selectedRange.value) {
-    case 7:
-      return 'Last 7 days';
-    case 14:
-      return 'Last 14 days';
-    case 30:
-      return 'Last 30 days';
-    case 60:
-      return 'Last 60 days';
-    case 90:
-      return 'Last 90 days';
-    case 180:
-      return 'Last 180 days';
-    case 360:
-      return 'Last 360 days';
-    default:
-      return '';
-  }
-
-});
-
-boardDisplay = computed(() => {
-    
-})
-
 </script>
 
 <template>
@@ -193,16 +109,7 @@ boardDisplay = computed(() => {
       <button>Steps TOP</button>
       <DataPicker
         v-model="selectedRange"
-        :options="[
-          '7 days',
-          
-          '14 days',
-          '30 days',
-          '60 days',
-          '90 days',
-          '180 days',
-          '360 days',
-        ]"
+        :options="['7 days', '14 days', '30 days', '60 days', '90 days', '180 days', '360 days']"
         width="120px"
         height="36px"
       />

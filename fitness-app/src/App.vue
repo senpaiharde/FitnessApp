@@ -8,6 +8,7 @@ import { ref, computed, onUnmounted, onMounted, reactive } from 'vue';
 import { workoutProgram } from './utils';
 import { loadAppData, removeAppdata, updateAppData } from './service/storage';
 import LeaderBoard from './components/pages/LeaderBoard.vue';
+import { formatISO } from 'date-fns';
 const defaultData = {};
 for (let workoutIdx in workoutProgram) {
   const workoutData = workoutProgram[workoutIdx];
@@ -25,9 +26,9 @@ const appData = reactive({
   workoutData: defaultData,
   steps: 0,
   completedCount: 0,
-  stepHistory: {},
-  workoutHistory: {},
-  timeHistory: {},
+  stepHistory: { type: Object, default: () => ({}) },
+  workoutHistory: { type: Object, default: () => ({}) },
+  timeHistory: { type: Object, default: () => ({}) },
 });
 onMounted(() => {
   // only enter the if block if we find some data saved to the key workouts in localstroage database
@@ -81,30 +82,9 @@ function handleSelectWorkout(idx) {
   console.log('Selected workout index:', selectedWorkout.value);
 }
 
-
 // save the current date in ISO format
 const today = formatISO(new Date(), { representation: 'date' });
 const data = loadAppData();
-
-
-function handleSaveWorkout(value) {
-
-  const workoutHistory = data.workoutHistory || {};
-    workoutHistory[today] = value;
-    appData.workoutHistory = workoutHistory;
-    updateAppData({ workoutHistory: appData.workoutHistory });
-    
-  appData.workoutData[selectedWorkout.value] = value;
-  updateAppData({ workoutData: appData.workoutData });
-  appData.completedCount++;
-  updateAppData({ completedCount: appData.completedCount });
-  //localStorage.setItem('workoutData', JSON.stringify(data.value));
-
-  selectedDisplay.value = 2; // Switch back to Dashboard display
-
-  selectedWorkout.value = -1; // Reset selected workout
-}
-
 
 function handleRestPlan() {
   removeAppdata();
@@ -115,31 +95,54 @@ function handleRestPlan() {
   selectedDisplay.value = 1; // Switch back to Welcome display
   window.location.reload(); // Reload the page to reset the state
 }
+
+function handleSaveWorkout(value) {
+  const workoutHistory = { ...(data.workoutHistory || {}) };
+  workoutHistory[today] = (workoutHistory[today] || 0) + 1;
+  appData.workoutHistory = workoutHistory;
+
+  appData.workoutData[selectedWorkout.value] = value;
+
+  appData.completedCount++;
+
+  //localStorage.setItem('workoutData', JSON.stringify(data.value));
+  updateAppData({
+    workoutData: appData.workoutData,
+    completedCount: appData.completedCount,
+    workoutHistory,
+  });
+  selectedDisplay.value = 2; // Switch back to Dashboard display
+
+  selectedWorkout.value = -1; // Reset selected workout
+}
+
 function handleSaveTimerData(value) {
-   
+  // Clone & accumulate into today’s bucket
+  const timerHistory = { ...data.timeHistory };
+  timerHistory[today] = (timerHistory[today] || 0) + value;
+
+  // (Optionally prune old dates here…)
+
+  // Update both the raw timerData and the historical log
   appData.timerData = value;
-
-  updateAppData({ timerData: appData.timerData });
-
-  const timerHistory = data.timeHistory || {};
-  timerHistory[today] = value;
   appData.timeHistory = timerHistory;
-  updateAppData({ timeHistory: appData.timeHistory });
 
-
+  updateAppData({
+    timerData: appData.timerData,
+    timeHistory: timerHistory || {},
+  });
 }
 
 function handleSaveSteps(value) {
-    
-    
+  const stepsHistory = { ...(data.stepHistory || {}) };
+  stepsHistory[today] = (stepsHistory[today] || 0) + value;
+
   appData.steps = value;
-  updateAppData({ steps: appData.steps });
-
-
-const stepHistory = data.stepHistory || {};
-  stepHistory[today] = value;
-  appData.stepHistory = stepHistory;
-  updateAppData({ stepHistory: appData.stepHistory });
+  appData.stepHistory = stepsHistory;
+  updateAppData({
+    steps: appData.steps,
+    stepHistory: stepsHistory,
+  });
 }
 </script>
 

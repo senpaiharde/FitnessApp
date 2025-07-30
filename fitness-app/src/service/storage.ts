@@ -4,9 +4,9 @@ interface AppData {
   workoutData: Record<string, any>; // or your specific workout shape
   steps: number;
   completedCount: number;
-   stepHistory?:     Record<string, number>;
-  workoutHistory?:  Record<string, number>;
-  timeHistory?:     Record<string, number>;
+  stepHistory?: Record<string, number>;
+  workoutHistory?: Record<string, number>;
+  timeHistory?: Record<string, number>;
 }
 const STORAGE_KEY = (uid) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
