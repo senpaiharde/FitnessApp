@@ -24,6 +24,7 @@ const appData = reactive({
   timerData: {},
   workoutData: defaultData,
   steps: 0,
+  completedCount: 0,
 });
 onMounted(() => {
   // only enter the if block if we find some data saved to the key workouts in localstroage database
@@ -80,6 +81,8 @@ function handleSelectWorkout(idx) {
 function handleSaveWorkout(value) {
   appData.workoutData[selectedWorkout.value] = value;
   updateAppData({ workoutData: appData.workoutData });
+  appData.completedCount++;
+  updateAppData({ completedCount: appData.completedCount });
   //localStorage.setItem('workoutData', JSON.stringify(data.value));
 
   selectedDisplay.value = 2; // Switch back to Dashboard display
@@ -92,6 +95,7 @@ function handleRestPlan() {
   appData.workoutData = defaultData; // Reset workout data
   appData.timerData = {};
   appData.steps = 0; // Reset steps
+  appData.completedCount = 0; // Reset completed count
   selectedDisplay.value = 1; // Switch back to Welcome display
   window.location.reload(); // Reload the page to reset the state
 }
@@ -104,12 +108,9 @@ function handleSaveSteps(value) {
   appData.steps = value;
   updateAppData({ steps: appData.steps });
 }
-
-
 </script>
 
 <template>
-   
   <Layouts
     :appData="appData"
     :selectedDisplay="selectedDisplay"

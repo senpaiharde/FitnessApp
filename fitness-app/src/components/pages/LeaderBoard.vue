@@ -100,7 +100,8 @@ function buildLeaderboard() {
     userId: uid,
     name: uid === user.value?.id ? user.value.firstName : 'Anonymous',
     totalSteps: data.steps,
-    totalWorkouts: data.workoutData ? Object.keys(data.workoutData).length : 0,
+    totalWorkouts:  data.completedCount,
+    
     timeSpent: Object.values(data.timerData || {}).reduce(
       (sum, e) => sum + (e.time || 0) + (e.minute || 0) * 60 + (e.hour || 0) * 3600,
       0
@@ -166,7 +167,7 @@ const selectedRange = ref(30);
         v-model="selectedRange"
         :options="[
           '7 days',
-          '',
+          
           '14 days',
           '30 days',
           '60 days',
