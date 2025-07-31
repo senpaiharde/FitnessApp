@@ -4,7 +4,7 @@ import Welcome from './components/pages/Welcome.vue';
 import Dashboard from './components/pages/Dashboard.vue';
 import Workout from './components/pages/Workout.vue';
 
-import { ref, computed, onUnmounted, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import { workoutProgram } from './utils';
 import { loadAppData, removeAppdata, updateAppData } from './service/storage';
 import LeaderBoard from './components/pages/LeaderBoard.vue';

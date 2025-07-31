@@ -122,10 +122,10 @@ const stepsPortal = ref(null);
 const handleSkip = () => {
   console.log('Skipping workout');
 
-  workout.forEach((exercise) => {
-    data[props.selectedWorkout][exercise.name].sets = 'skipped';
-    data[props.selectedWorkout][exercise.name].reps = 'skipped';
-    data[props.selectedWorkout][exercise.name].weight = 'skipped';
+  data.value[props.selectedWorkout].forEach((exercise) => {
+    exercise.sets = '';
+    exercise.reps = '';
+    exercise.weight = '';
   });
   props.handleSaveWorkout(data);
 };
@@ -218,7 +218,6 @@ const saveSteps = () => {
             </button>
           </div>
           <i class="fa-solid fa-dumbbell"></i>
-          
         </div>
 
         <h2 class="workoutName">{{ workoutTypes[props.selectedWorkout % 3] }} Workout</h2>
@@ -240,7 +239,7 @@ const saveSteps = () => {
         <h6>sets</h6>
         <h6>reps</h6>
         <h6>weights</h6>
-        <div v-for="(exercise, idx) in warmup" :key="idx" class="workout-grid-row">
+        <div v-for="(exercise, idx) in warmup" :key="exercise" class="workout-grid-row">
           <div class="grid-name">
             <p>{{ exercise.name }}</p>
             <button
@@ -269,7 +268,7 @@ const saveSteps = () => {
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </h6>
-        <div v-for="(exercise, idx) in workout" :key="idx" class="workout-grid-row">
+        <div v-for="(exercise, idx) in workout" :key="exercise" class="workout-grid-row">
           <div class="grid-name">
             <p>{{ exercise.name }}</p>
 
@@ -284,17 +283,17 @@ const saveSteps = () => {
             </button>
           </div>
           <input
-            v-model="data[props.selectedWorkout][exercise.name].sets"
+            v-model="data[props.selectedWorkout][idx].sets"
             type="text"
             :placeholder="exercise.sets + ' sets'"
           />
           <input
-            v-model="data[props.selectedWorkout][exercise.name].reps"
+            v-model="data[props.selectedWorkout][idx].reps"
             type="text"
             :placeholder="exercise.reps + ' reps'"
           />
           <input
-            v-model="data[props.selectedWorkout][exercise.name].weight"
+            v-model="data[props.selectedWorkout][idx].weight"
             class="grid-weights"
             type="text"
             placeholder="23Kg"
@@ -327,12 +326,9 @@ const saveSteps = () => {
     gap: 0.5rem;
   }
   .workoutName {
-    
-   
     font-size: 1.5rem;
     line-height: 2rem;
     align-self: center;
-    
   }
   .add-exercise-btn {
     margin: 0;
