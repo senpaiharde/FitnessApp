@@ -13,12 +13,16 @@ const defaultData = {};
 for (let workoutIdx in workoutProgram) {
   const workoutData = workoutProgram[workoutIdx];
 
-  defaultData[workoutIdx] = workoutData.exercises.map((exercise) => ({
-    name: exercise.name,
-    sets: '',
-    reps: '',
-    weight: '',
-  }));
+  if (Array.isArray(workoutData.workout)) {
+    defaultData[workoutIdx] = workoutData.workout.map((exercise) => ({
+      name: exercise.name,
+      sets: '',
+      reps: '',
+      weight: '',
+    }));
+  } else {
+    defaultData[workoutIdx] = [];
+  }
 }
 const selectedDisplay = ref(1);
 
@@ -40,21 +44,21 @@ onMounted(() => {
 
   // Ensure every workout index exists by merging defaults
   const mergedData = {};
-for (const idx in defaultData) {
-  const loaded = loadedData[idx];
+  for (const idx in defaultData) {
+    const loaded = loadedData[idx];
 
-  if (Array.isArray(loaded)) {
-    mergedData[idx] = loaded;
-  } else if (loaded && typeof loaded === 'object') {
-    // Convert old object format to array
-    mergedData[idx] = Object.entries(loaded).map(([name, values]) => ({
-      name,
-      ...values,
-    }));
-  } else {
-    mergedData[idx] = defaultData[idx];
+    if (Array.isArray(loaded)) {
+      mergedData[idx] = loaded;
+    } else if (loaded && typeof loaded === 'object') {
+      // Convert old object format to array
+      mergedData[idx] = Object.entries(loaded).map(([name, values]) => ({
+        name,
+        ...values,
+      }));
+    } else {
+      mergedData[idx] = defaultData[idx];
+    }
   }
-}
   appData.timerData = store?.timerData || {};
   appData.steps = store?.steps || 0;
   appData.workoutData = mergedData;
@@ -75,7 +79,7 @@ const isWorkoutComplete = computed(() => {
 const firstInCompletedWorkoutIndex = computed(() => {
   for (const [idx, workoutObj] of Object.entries(appData.workoutData)) {
     const allFilled = workoutObj.every(
-      (ex) =>  ex.sets?.trim?.() !== ''  && ex.reps?.trim?.() !== '' && ex.weight?.trim?.() !== ''
+      (ex) => ex.sets?.trim?.() !== '' && ex.reps?.trim?.() !== '' && ex.weight?.trim?.() !== ''
     );
     if (!allFilled) return parseInt(idx);
   }
