@@ -38,18 +38,12 @@ console.log(
 const reactiveData = toRef(props, 'workoutData');
 const data = computed(() => reactiveData.value);
 onMounted(() => {
-  const workout = data[props.selectedWorkout] || {};
-  for (const key in workout) {
-    workout[key].sets;
-    workout[key].reps;
-    workout[key].weight;
-  }
-  const t = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
-  time.value = t.time || 0;
-  minute.value = t.minute || 0;
-  hour.value = t.hour || 0;
+  const saved = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
+  time.value = saved.time || 0;
+  minute.value = saved.minute || 0;
+  hour.value = saved.hour || 0;
 
-  localSteps.value = data[props.selectedWorkout]?.steps || 0;
+  localSteps.value = props.steps || 0;
   console.log('Mounted workout, preloaded values:', data[props.selectedWorkout]);
 });
 watch(
@@ -71,7 +65,6 @@ function clearTimer() {
     time.value = 0;
     minute.value = 0;
     hour.value = 0;
-    console.log('Timer cleared');
   }
 }
 let click = 0;
@@ -120,14 +113,12 @@ function stopTimer() {
 }
 const stepsPortal = ref(null);
 const handleSkip = () => {
-  console.log('Skipping workout');
-
-  data.value[props.selectedWorkout].forEach((exercise) => {
+  workout.value.forEach((exercise) => {
     exercise.sets = '';
     exercise.reps = '';
     exercise.weight = '';
   });
-  props.handleSaveWorkout(data);
+  props.handleSaveWorkout(workout.value);
 };
 
 const saveSteps = () => {
@@ -135,11 +126,7 @@ const saveSteps = () => {
     console.warn('Please enter a valid number of steps.');
     return;
   }
-  data[props.selectedWorkout].steps = localSteps.value;
-
   props.handleSaveSteps(localSteps.value);
-  //localStorage.setItem(JSON.stringify(data[selectedWorkout].steps = steps.value))
-  console.log(localSteps);
 };
 </script>
 
@@ -239,7 +226,7 @@ const saveSteps = () => {
         <h6>sets</h6>
         <h6>reps</h6>
         <h6>weights</h6>
-        <div v-for="(exercise, idx) in warmup" :key="exercise" class="workout-grid-row">
+        <div v-for="(exercise, idx) in warmup" :key="exercise.name + idx" class="workout-grid-row">
           <div class="grid-name">
             <p>{{ exercise.name }}</p>
             <button
@@ -268,7 +255,7 @@ const saveSteps = () => {
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </h6>
-        <div v-for="(exercise, idx) in workout" :key="exercise" class="workout-grid-row">
+        <div v-for="(exercise, idx) in workout" :key="exercise.name + idx" class="workout-grid-row">
           <div class="grid-name">
             <p>{{ exercise.name }}</p>
 
@@ -283,17 +270,17 @@ const saveSteps = () => {
             </button>
           </div>
           <input
-            v-model="data[props.selectedWorkout][idx].sets"
+            v-model="workout[idx].sets"
             type="text"
             :placeholder="exercise.sets + ' sets'"
           />
           <input
-            v-model="data[props.selectedWorkout][idx].reps"
+            v-model="workout[idx].reps"
             type="text"
             :placeholder="exercise.reps + ' reps'"
           />
           <input
-            v-model="data[props.selectedWorkout][idx].weight"
+            v-model="workout[idx].weight"
             class="grid-weights"
             type="text"
             placeholder="23Kg"

@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 interface AppData {
   timerData: Record<number, { time: number; minute: number; hour: number }> | null;
-  workoutData: Record<string, any>; // or your specific workout shape
+  workoutData: Record<string, any>;
   steps: number;
   completedCount: number;
   stepHistory?: Record<string, number>;
