@@ -150,7 +150,7 @@ const saveSteps = () => {
         <h3>{{ selectedExercise }}</h3>
 
         <div class="exercise-image">
-          <small>Description daddy </small>
+          <small>Description</small>
           <p class="exercise-description">
             {{ exerciseDescription || 'No description available for this exercise.' }}
           </p>
@@ -218,19 +218,19 @@ const saveSteps = () => {
             </button>
           </div>
           <i class="fa-solid fa-dumbbell"></i>
+          
         </div>
 
-        <h2>{{ workoutTypes[props.selectedWorkout % 3] }} Workout</h2>
-        
+        <h2 class="workoutName">{{ workoutTypes[props.selectedWorkout % 3] }} Workout</h2>
+
         <button
-        v-if="workoutTypes[props.selectedWorkout % 3] === 'legs'"
+          v-if="workoutTypes[props.selectedWorkout % 3] === 'legs'"
           @click="
             () => {
               stepsPortal = true;
               handleSkip();
             }
           "
-          
         >
           {{ workoutTypes[props.selectedWorkout % 3] === 'legs' ? 'Steps Time?' : '' }}
         </button>
@@ -263,7 +263,12 @@ const saveSteps = () => {
         <h4 class="grid-name">Workout</h4>
         <h6>sets</h6>
         <h6>reps</h6>
-        <h6 class="grid-weights">weights</h6>
+        <h6 class="grid-weights">
+          weights
+          <button class="add-exercise-btn" @click="() => props.handleAddExercise()">
+            <i class="fa-regular fa-circle-question"></i>
+          </button>
+        </h6>
         <div v-for="(exercise, idx) in workout" :key="idx" class="workout-grid-row">
           <div class="grid-name">
             <p>{{ exercise.name }}</p>
@@ -315,6 +320,30 @@ const saveSteps = () => {
 </template>
 
 <style scoped>
+@media screen and (max-width: 500px) {
+  .plan-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .workoutName {
+    
+   
+    font-size: 1.5rem;
+    line-height: 2rem;
+    align-self: center;
+    
+  }
+  .add-exercise-btn {
+    margin: 0;
+    width: 40px;
+    height: 40px;
+  }
+}
+.add-exercise-btn {
+  align-items: center;
+  margin-left: 2rem;
+}
 .exercise-btns {
   display: flex;
   justify-content: space-between;

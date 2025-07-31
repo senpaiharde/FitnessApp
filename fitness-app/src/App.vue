@@ -12,10 +12,13 @@ import { formatISO } from 'date-fns';
 const defaultData = {};
 for (let workoutIdx in workoutProgram) {
   const workoutData = workoutProgram[workoutIdx];
-  defaultData[workoutIdx] = {};
-  for (let e of workoutData.workout) {
-    defaultData[workoutIdx][e.name] = { sets: '', reps: '', weight: '' };
-  }
+
+  defaultData[workoutIdx] = workoutData.exercises.map((exercise) => ({
+    name: exercise.name,
+    sets: '',
+    reps: '',
+    weight: '',
+  }));
 }
 const selectedDisplay = ref(1);
 
@@ -36,13 +39,22 @@ onMounted(() => {
   const loadedData = store.workoutData || {};
 
   // Ensure every workout index exists by merging defaults
-  const mergedData = { ...defaultData };
-  for (const idx in defaultData) {
-    mergedData[idx] = {
-      ...defaultData[idx],
-      ...(loadedData[idx] || {}), // keep any saved values
-    };
+  const mergedData = {};
+for (const idx in defaultData) {
+  const loaded = loadedData[idx];
+
+  if (Array.isArray(loaded)) {
+    mergedData[idx] = loaded;
+  } else if (loaded && typeof loaded === 'object') {
+    // Convert old object format to array
+    mergedData[idx] = Object.entries(loaded).map(([name, values]) => ({
+      name,
+      ...values,
+    }));
+  } else {
+    mergedData[idx] = defaultData[idx];
   }
+}
   appData.timerData = store?.timerData || {};
   appData.steps = store?.steps || 0;
   appData.workoutData = mergedData;
@@ -56,14 +68,14 @@ const isWorkoutComplete = computed(() => {
   console.log('isWorkoutComplete check', curr);
   if (!curr) return false;
 
-  return Object.values(curr).every(
-    (ex) => ex.sets.trim() !== '' && ex.reps.trim() !== '' && ex.weight.trim() !== ''
+  return curr.every(
+    (ex) => ex.sets?.trim?.() !== '' && ex.reps?.trim?.() !== '' && ex.weight?.trim?.() !== ''
   );
 });
 const firstInCompletedWorkoutIndex = computed(() => {
   for (const [idx, workoutObj] of Object.entries(appData.workoutData)) {
-    const allFilled = Object.values(workoutObj).every(
-      (ex) => ex.sets.trim() !== '' && ex.reps.trim() !== '' && ex.weight.trim() !== ''
+    const allFilled = workoutObj.every(
+      (ex) =>  ex.sets?.trim?.() !== ''  && ex.reps?.trim?.() !== '' && ex.weight?.trim?.() !== ''
     );
     if (!allFilled) return parseInt(idx);
   }

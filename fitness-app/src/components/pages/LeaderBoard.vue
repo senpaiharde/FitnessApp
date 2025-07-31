@@ -13,6 +13,7 @@ import { Transition, ref, watch, computed } from 'vue';
 import { loadAllAppData, setSignedInUser } from '../../service/storage';
 import DataPicker from '../../service/DataPicker.vue';
 import { buildLeaderboard, enter, leave, WorkoutDataDisplay } from '../../utils/code';
+import { OptionsOfRange, OptionsOfRangeInDays } from '../../utils/options';
 
 const props = defineProps({
   selectedWorkout: Number,
@@ -24,10 +25,10 @@ const props = defineProps({
 
 const { openSignIn, isSignedIn } = useClerk();
 const { user } = useUser();
-
+const toggleStats = () => {
+  showStats.value = !showStats.value;
+};
 const showStats = ref(true);
-const statsGrid = ref(null);
-const totalWorkouts = Object.keys(props.workoutData).length;
 
 watch(
   () => user['value']?.id,
@@ -52,8 +53,6 @@ const workoutDisplay = WorkoutDataDisplay({
 
 const topUsers = ref([]);
 
-console.log('yesdaddy', JSON.parse(localStorage.getItem('allAppData')));
-
 const board = buildLeaderboard(user, 10);
 console.log('board', board);
 console.log('topUsers', topUsers.value);
@@ -70,7 +69,6 @@ watch(
 );
 
 const selectedRange = ref(30);
-const OptionsOfRange = [7, 14, 30, 60, 90, 180, 365];
 
 watch(
   selectedRange,
@@ -82,6 +80,28 @@ watch(
 );
 
 console.log('selectedRange', selectedRange.value);
+
+const selectedMetric = ref('all');
+
+const filterTopUsers = computed(() => {
+  if (selectedMetric.value === 'all') {
+    return topUsers.value;
+  } else if (selectedMetric.value === 'Workouts') {
+    return topUsers.value.filter((user) => user.totalWorkouts > 0);
+  } else if (selectedMetric.value === 'steps') {
+    return topUsers.value.filter((user) => user.totalSteps > 0);
+  } else if (selectedMetric.value === 'time') {
+    return topUsers.value.filter((user) => user.timeSpent > 0);
+  }
+  return [...topUsers.value].sort((a, b) => b[selectedMetric.value] - a[selectedMetric.value]);
+});
+watch(filterTopUsers, (newList) => {
+  console.log('Filtered Users:', newList.target);
+});
+
+watch(selectedMetric, (newList) => {
+  console.log('selectedMetric', newList, [...filterTopUsers.value, ...topUsers.value]);
+});
 </script>
 
 <template>
@@ -114,20 +134,21 @@ console.log('selectedRange', selectedRange.value);
   <section id="daddy">
     <div class="button-container">
       <select v-model="selectedRange" class="data-picker">
-        {{ selectedRange }} Days
+        {{
+          selectedRange
+        }}
+        Days
         <option v-for="(item, idx) in OptionsOfRange" :key="idx" :value="item">
           {{ item }} Days
         </option>
         >
       </select>
-      <select>
-        <option value="all">All Users</option>
-        <option value="friends">Friends</option>
-        <option value="top">Top Users</option>
+      <select v-model="selectedMetric">
+        <option v-for="(item, idx) in OptionsOfRangeInDays" :key="idx" :value="item">
+          {{ item }}
+        </option>
       </select>
       <button @click="openSignIn">Search</button>
-
-      
     </div>
 
     <div class="top-table">
@@ -142,12 +163,12 @@ console.log('selectedRange', selectedRange.value);
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(user, index) in topUsers" :key="index">
+          <tr v-for="(user, index) in filterTopUsers" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ user.firstName }} {{ user.lastName }}</td>
-            <td>{{ user.workouts }}</td>
-            <td>{{ user.steps }}</td>
-            <td>{{ user.time }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.totalWorkouts }}</td>
+            <td>{{ user.totalSteps }}</td>
+            <td>{{ user.timeSpent }}</td>
           </tr>
         </tbody>
       </table>
@@ -206,7 +227,7 @@ console.log('selectedRange', selectedRange.value);
 }
 
 .toggle-bar button {
-  background: #007bff;
+  
   color: white;
   border: none;
   padding: 0.5rem 1rem;
