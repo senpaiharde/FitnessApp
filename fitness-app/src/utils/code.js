@@ -2,7 +2,7 @@ import { loadAllAppData } from '../service/storage';
 
 import { ref } from 'vue';
 
-export function buildLeaderboard(user,limit = 10) {
+export function buildLeaderboard(user, limit = 10) {
   const topUsers = ref([]);
   const all = loadAllAppData();
   const board = Object.entries(all).map(([uid, data]) => ({
@@ -40,11 +40,15 @@ export function enter(el) {
   el.style.transition = 'max-height 0.5s ease';
 }
 
-export function WorkoutDataDisplay({timerData, totalWorkouts, firstInCompletedWorkoutIndex, steps, workoutData, completedCount}) {
-const totalWorkouts = Object.keys(workoutData).length;
+export function WorkoutDataDisplay({
+  timerData,
+  
+  firstInCompletedWorkoutIndex,
+  steps,
+  workoutData,
+}) {
+  const totalWorkouts = Object.keys(workoutData).length;
 
-
-   
   const timeSpent = Object.values(timerData).reduce((acc, curr) => {
     return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
   }, 0);
@@ -54,7 +58,7 @@ const totalWorkouts = Object.keys(workoutData).length;
     minutes: Math.floor((timeSpent % 3600) / 60),
     seconds: timeSpent % 60,
   };
-  return  [
+  return [
     {
       workout: 'Total Workouts',
       classname: 'card-icon fa-solid fa-dumbbell',
@@ -63,7 +67,7 @@ const totalWorkouts = Object.keys(workoutData).length;
     {
       workout: 'Total Steps',
       classname: 'card-icon fa-solid fa-weight-hanging',
-      value:steps.toLocaleString() + ' steps',
+      value: steps.toLocaleString() + ' steps',
     },
     {
       workout: 'Total Time',

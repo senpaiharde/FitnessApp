@@ -50,8 +50,6 @@ const workoutDisplay = WorkoutDataDisplay({
   completedCount: props.completedCount,
 });
 
-
-
 const topUsers = ref([]);
 
 console.log('yesdaddy', JSON.parse(localStorage.getItem('allAppData')));
@@ -72,6 +70,18 @@ watch(
 );
 
 const selectedRange = ref(30);
+const OptionsOfRange = [7, 14, 30, 60, 90, 180, 365];
+
+watch(
+  selectedRange,
+  (newRange) => {
+    console.log('Selected range changed:', newRange);
+    topUsers.value = buildLeaderboard(user, newRange);
+  },
+  { immediate: true }
+);
+
+console.log('selectedRange', selectedRange.value);
 </script>
 
 <template>
@@ -103,16 +113,44 @@ const selectedRange = ref(30);
   </transition>
   <section id="daddy">
     <div class="button-container">
-      <button>Workouts TOP</button>
-      <button>Steps TOP</button>
-      <button>Time Waster</button>
-      <button>Steps TOP</button>
-      <DataPicker
-        v-model="selectedRange"
-        :options="['7 days', '14 days', '30 days', '60 days', '90 days', '180 days', '360 days']"
-        width="120px"
-        height="36px"
-      />
+      <select v-model="selectedRange" class="data-picker">
+        {{ selectedRange }} Days
+        <option v-for="(item, idx) in OptionsOfRange" :key="idx" :value="item">
+          {{ item }} Days
+        </option>
+        >
+      </select>
+      <select>
+        <option value="all">All Users</option>
+        <option value="friends">Friends</option>
+        <option value="top">Top Users</option>
+      </select>
+      <button @click="openSignIn">Search</button>
+
+      
+    </div>
+
+    <div class="top-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Workouts</th>
+            <th>Steps</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, index) in topUsers" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>{{ user.workouts }}</td>
+            <td>{{ user.steps }}</td>
+            <td>{{ user.time }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="login-container">
       <SignedOut>
@@ -133,14 +171,26 @@ const selectedRange = ref(30);
 </template>
 
 <style scoped>
+.top-table {
+  width: 100%;
+  overflow-x: auto;
+}
+.top-table table {
+  width: 100%; /* fill the wrapper */
+  table-layout: fixed; /* columns share width evenly (optional) */
+  font-size: 11pt;
+  color: #ccc;
+}
 #daddy {
   display: flex;
   flex-direction: column;
-  align-items: center;
+
+  align-items: stretch;
   margin-top: 1rem;
   position: relative;
   z-index: 1;
   clear: both;
+  padding-bottom: 60px;
 }
 .button-container {
   gap: 0.5rem;
