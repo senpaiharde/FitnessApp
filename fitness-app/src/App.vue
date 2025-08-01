@@ -11,17 +11,18 @@ import LeaderBoard from './components/pages/LeaderBoard.vue';
 import { formatISO } from 'date-fns';
 const defaultData = {};
 for (let workoutIdx in workoutProgram) {
-  const workoutData = workoutProgram[workoutIdx];
+  const index = Number(workoutIdx);
+  const plan = workoutProgram[workoutIdx];
 
-  if (Array.isArray(workoutData.workout)) {
-    defaultData[workoutIdx] = workoutData.workout.map((exercise) => ({
+  if (plan && Array.isArray(plan.workout)) {
+    defaultData[index] = plan.workout.map((exercise) => ({
       name: exercise.name,
       sets: '',
       reps: '',
       weight: '',
     }));
   } else {
-    defaultData[workoutIdx] = [];
+    defaultData[index] = [];
   }
 }
 const selectedDisplay = ref(1);
@@ -69,18 +70,32 @@ onMounted(() => {
 
 const isWorkoutComplete = computed(() => {
   const curr = appData.workoutData[selectedWorkout.value];
-  console.log('isWorkoutComplete check', curr);
-  if (!curr) return false;
+  if (!Array.isArray(curr)) return false;
 
   return curr.every(
-    (ex) => ex.sets?.trim?.() !== '' && ex.reps?.trim?.() !== '' && ex.weight?.trim?.() !== ''
+    (ex) =>
+      typeof ex.sets === 'string' &&
+      typeof ex.reps === 'string' &&
+      typeof ex.weight === 'string' &&
+      ex.sets.trim() !== '' &&
+      ex.reps.trim() !== '' &&
+      ex.weight.trim() !== ''
   );
 });
 const firstInCompletedWorkoutIndex = computed(() => {
   for (const [idx, workoutObj] of Object.entries(appData.workoutData)) {
+    if (!Array.isArray(workoutObj)) continue;
+
     const allFilled = workoutObj.every(
-      (ex) => ex.sets?.trim?.() !== '' && ex.reps?.trim?.() !== '' && ex.weight?.trim?.() !== ''
+      (ex) =>
+        typeof ex.sets === 'string' &&
+        typeof ex.reps === 'string' &&
+        typeof ex.weight === 'string' &&
+        ex.sets.trim() !== '' &&
+        ex.reps.trim() !== '' &&
+        ex.weight.trim() !== ''
     );
+
     if (!allFilled) return parseInt(idx);
   }
   return -1;
@@ -113,14 +128,17 @@ function handleRestPlan() {
 }
 
 function handleSaveWorkout(value) {
+  console.log('Saving workout data:', value);
   const workoutHistory = { ...(data.workoutHistory || {}) };
+  console.log(workoutHistory, 'yeshistroy');
+  
   workoutHistory[today] = (workoutHistory[today] || 0) + 1;
   appData.workoutHistory = workoutHistory;
-
+  console.log(workoutHistory, '2rd')
   appData.workoutData[selectedWorkout.value] = value;
 
   appData.completedCount++;
-
+   
   //localStorage.setItem('workoutData', JSON.stringify(data.value));
   updateAppData({
     workoutData: appData.workoutData,

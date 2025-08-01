@@ -19,7 +19,7 @@ const warmup = computed(() => workoutProgram[props.selectedWorkout]?.warmup || [
 let selectedExercise = ref(null);
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 console.log('Selected workout:', props.selectedWorkout, 'Workout data:', props.workoutData);
-
+console.log(workout.value, 'this is workout');
 const day = props.selectedWorkout + 1;
 
 let timers = reactive(props.timerData || {});
@@ -45,6 +45,13 @@ onMounted(() => {
 
   localSteps.value = props.steps || 0;
   console.log('Mounted workout, preloaded values:', data[props.selectedWorkout]);
+
+  const data = computed(() => data[props.selectedWorkout]);
+  for (const key in workout) {
+    workout[key].sets;
+    workout[key].reps;
+    workout[key].weight;
+  }
 });
 watch(
   () => props.selectedWorkout,
@@ -128,6 +135,21 @@ const saveSteps = () => {
   }
   props.handleSaveSteps(localSteps.value);
 };
+
+if (!workout.value) {
+  console.warn('Workout not initialized — probably missing from appData.workoutData');
+}
+
+console.log('[WORKOUT.vue] props.handleSaveWorkout =', props.handleSaveWorkout);
+watch(
+  () => props.selectedWorkout,
+  () => {
+    console.log('[DEBUG] Selected Workout Index:', props.selectedWorkout);
+    console.log('[DEBUG] workoutData at index:', props.workoutData?.[props.selectedWorkout]);
+    console.log('[DEBUG] Computed workout:', workout.value);
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -239,7 +261,7 @@ const saveSteps = () => {
               <i class="fa-regular fa-circle-question"></i>
             </button>
           </div>
-          <p>{{ exercise.sets || '-' }}</p>
+          <p>{{ exercise?.sets || '-' }}</p>
           <p>{{ exercise.reps || '-' }}</p>
 
           <input class="grid-weights" type="text" placeholder="23Kg" disabled />
@@ -269,16 +291,8 @@ const saveSteps = () => {
               <i class="fa-regular fa-circle-question"></i>
             </button>
           </div>
-          <input
-            v-model="workout[idx].sets"
-            type="text"
-            :placeholder="exercise.sets + ' sets'"
-          />
-          <input
-            v-model="workout[idx].reps"
-            type="text"
-            :placeholder="exercise.reps + ' reps'"
-          />
+          <input v-model="workout[idx].sets" type="text" :placeholder="exercise.sets + ' sets'" />
+          <input v-model="workout[idx].reps" type="text" :placeholder="exercise.reps + ' reps'" />
           <input
             v-model="workout[idx].weight"
             class="grid-weights"
@@ -289,13 +303,17 @@ const saveSteps = () => {
       </div>
 
       <div class="card workout-btns">
-        <button @click="() => props.handleSaveWorkout(data[props.selectedWorkout])">
+        <button
+          @click="
+            (() => console.log(props.handleSaveWorkout(workout)), props.handleSaveWorkout(workout))
+          "
+        >
           Save & Exit
           <i class="fa-solid fa-save"></i>
         </button>
         <button
           :disabled="!props.isWorkoutComplete"
-          @click="() => props.handleSaveWorkout(data[props.selectedWorkout])"
+          @click="() => props.handleSaveWorkout(workout.value)"
         >
           Complete
           <i class="fa-solid fa-check"></i>

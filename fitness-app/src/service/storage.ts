@@ -12,15 +12,18 @@ const STORAGE_KEY = (uid) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
 const USER_KEY = 'userId';
 const ALL_DATA_KEY = 'allAppData';
+
 export function getUserId() {
   let id = localStorage.getItem(USER_KEY);
   if (id) return id;
+
   let anonId = localStorage.getItem(ANON_KEY);
-  if (!id) {
-    anonId = v4();
-    localStorage.setItem(ANON_KEY, anonId);
-  }
-  return id;
+  if (anonId) return anonId;
+
+  anonId = v4();
+  localStorage.setItem(ANON_KEY, anonId);
+  localStorage.setItem(USER_KEY, anonId);
+  return anonId;
 }
 
 export function setSignedInUser(clerkUserId: string) {
@@ -39,7 +42,8 @@ export function setSignedInUser(clerkUserId: string) {
   }
   localStorage.setItem(USER_KEY, clerkUserId);
 }
-
+const userId = localStorage.getItem('userId') || localStorage.getItem('anonUserId');
+console.log('Using ID:', userId); // 🔍 debugging
 export function loadAppData(): AppData {
   const uid = getUserId();
   console.log('Loading app data for user:', uid);
