@@ -50,13 +50,8 @@ onMounted(() => {
 
     if (Array.isArray(loaded)) {
       mergedData[idx] = loaded;
-    } else if (loaded && typeof loaded === 'object') {
-      // Convert old object format to array
-      mergedData[idx] = Object.entries(loaded).map(([name, values]) => ({
-        name,
-        ...values,
-      }));
     } else {
+      // Fallback ONLY if nothing valid is saved
       mergedData[idx] = defaultData[idx];
     }
   }
@@ -131,14 +126,14 @@ function handleSaveWorkout(value) {
   console.log('Saving workout data:', value);
   const workoutHistory = { ...(data.workoutHistory || {}) };
   console.log(workoutHistory, 'yeshistroy');
-  
+
   workoutHistory[today] = (workoutHistory[today] || 0) + 1;
   appData.workoutHistory = workoutHistory;
-  console.log(workoutHistory, '2rd')
+  console.log(workoutHistory, '2rd');
   appData.workoutData[selectedWorkout.value] = value;
 
   appData.completedCount++;
-   
+
   //localStorage.setItem('workoutData', JSON.stringify(data.value));
   updateAppData({
     workoutData: appData.workoutData,
