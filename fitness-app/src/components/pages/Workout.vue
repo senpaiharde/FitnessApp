@@ -4,6 +4,7 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 
 const props = defineProps({
+  handleDeleteExercise: Function,
   handleAddWorkout: Function,
   handleSaveSteps: Function,
   handleSaveTimerData: Function,
@@ -148,7 +149,7 @@ const values = reactive({
   weight: '',
 });
 
-const EditAndAddForm = ref(true);
+const EditAndAddForm = ref(false);
 
 function handleSaveNewWorkout(value) {
   props.handleAddWorkout({ ...value });
@@ -291,7 +292,9 @@ function handleSaveNewWorkout(value) {
           class="workout-grid-row"
           v-if="EditAndAddForm"
         >
+        
           <div class="grid-name">
+            <button type="submit" class="submit-btn">Add</button>
             <input v-model="values.name" placeholder="Exercise Name" required />
 
             <button>
@@ -302,11 +305,14 @@ function handleSaveNewWorkout(value) {
           <input v-model="values.reps" type="text" placeholder="Reps" />
           <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
 
-          <button type="submit" class="submit-btn">Add</button>
+          
         </form>
 
         <div v-for="(exercise, idx) in workout" :key="exercise.name + idx" class="workout-grid-row">
           <div class="grid-name">
+            <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(idx)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
             <p>{{ exercise.name }}</p>
 
             <button
@@ -332,8 +338,8 @@ function handleSaveNewWorkout(value) {
       </div>
 
       <div class="card workout-btns">
-        <button @click="() => EditAndAddForm((prev) => !prev)">
-          Add & Edit
+        <button @click="EditAndAddForm = !EditAndAddForm">
+          {{ EditAndAddForm ? 'Done' : 'Add & Edit' }}
           <i class="fa-solid fa-save"></i>
         </button>
         <button @click="() => props.handleSaveWorkout(workout)">

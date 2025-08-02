@@ -7,12 +7,6 @@ const props = defineProps({
   firstInCompletedWorkoutIndex: Number,
   handleRestPlan: Function,
 });
-console.log(
-  'Grid component loaded',
-  props.handleRestPlan,
-  props.handleSelectWorkout,
-  props.firstInCompletedWorkoutIndex
-);
 </script>
 
 <template>

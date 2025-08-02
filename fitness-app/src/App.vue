@@ -192,6 +192,21 @@ function handleAddWorkout(value) {
     workoutHistory,
   });
 }
+
+
+function handleDeleteExercise(exerciseIndex) {
+  const workoutIndex = selectedWorkout.value;
+  const currentExercises = appData.workoutData[workoutIndex];
+
+  if (!currentExercises || !currentExercises.length) return;
+
+  appData.workoutData[workoutIndex].splice(exerciseIndex, 1);
+
+  updateAppData({
+    workoutData: appData.workoutData,
+    workoutHistory: appData.workoutHistory,
+  });
+}
 </script>
 
 <template>
@@ -210,6 +225,7 @@ function handleAddWorkout(value) {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
+    :handleDeleteExercise="handleDeleteExercise"
       :handleAddWorkout="handleAddWorkout"
       :timerData="appData.timerData"
       :steps="appData.steps"
