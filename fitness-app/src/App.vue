@@ -170,6 +170,28 @@ function handleSaveSteps(value) {
     stepHistory: stepsHistory,
   });
 }
+
+function handleAddWorkout(value) {
+  console.log('Saving workout data:', value);
+  const workoutHistory = { ...(data.workoutHistory || {}) };
+  console.log(workoutHistory, 'yeshistroy');
+
+  workoutHistory[today] = (workoutHistory[today] || 0) + 1;
+  appData.workoutHistory = workoutHistory;
+  console.log(workoutHistory, '2rd');
+  appData.workoutData[selectedWorkout.value].push({
+    name: value.name,
+    sets: value.sets,
+    reps: value.reps,
+    weight: value.weight,
+  });
+
+  updateAppData({
+    workoutData: appData.workoutData,
+
+    workoutHistory,
+  });
+}
 </script>
 
 <template>

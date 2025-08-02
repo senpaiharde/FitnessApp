@@ -140,16 +140,14 @@ const saveSteps = () => {
   props.handleSaveSteps(localSteps.value);
 };
 
-if (!workout.value) {
-  console.warn('Workout not initialized — probably missing from appData.workoutData');
-}
+const values = reactive({
+    name : '',
+    sets: '',
+    reps: '',
+    weight: '',
+})
 
-console.log(
-  '[WORKOUT.vue] props.handleSaveWorkout =',
-  data.value,
-  props.selectedWorkout,
-  data.value.length > props.selectedWorkout ? 'yes' : ' no'
-);
+
 </script>
 
 <template>
@@ -291,6 +289,7 @@ console.log(
               <i class="fa-regular fa-circle-question"></i>
             </button>
           </div>
+          
           <input v-model="workout[idx].sets" type="text" :placeholder="exercise.sets + ' sets'" />
           <input v-model="workout[idx].reps" type="text" :placeholder="exercise.reps + ' reps'" />
           <input
@@ -303,6 +302,10 @@ console.log(
       </div>
 
       <div class="card workout-btns">
+         <button @click="() => props.handleSaveWorkout(workout)">
+          Add Workout
+          <i class="fa-solid fa-save"></i>
+        </button>
         <button @click="() => props.handleSaveWorkout(workout)">
           Save & Exit
           <i class="fa-solid fa-save"></i>
