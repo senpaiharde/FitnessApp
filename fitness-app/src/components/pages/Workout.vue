@@ -4,6 +4,7 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 
 const props = defineProps({
+  handleAddWorkout: Function,
   handleSaveSteps: Function,
   handleSaveTimerData: Function,
   timerData: Object,
@@ -141,13 +142,22 @@ const saveSteps = () => {
 };
 
 const values = reactive({
-    name : '',
-    sets: '',
-    reps: '',
-    weight: '',
-})
+  name: '',
+  sets: '',
+  reps: '',
+  weight: '',
+});
 
+const EditAndAddForm = ref(true);
 
+function handleSaveNewWorkout(value) {
+  props.handleAddWorkout({ ...value });
+  EditAndAddForm(false);
+  values.name = '';
+  values.sets = '';
+  values.reps = '';
+  values.weight = '';
+}
 </script>
 
 <template>
@@ -275,6 +285,26 @@ const values = reactive({
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </h6>
+
+        <form
+          @submit.prevent="handleSaveNewWorkout(values)"
+          class="workout-grid-row"
+          v-if="EditAndAddForm"
+        >
+          <div class="grid-name">
+            <input v-model="values.name" placeholder="Exercise Name" required />
+
+            <button>
+              <i class="fa-regular fa-circle-question"></i>
+            </button>
+          </div>
+          <input v-model="values.sets" type="text" placeholder="Sets" />
+          <input v-model="values.reps" type="text" placeholder="Reps" />
+          <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
+
+          <button type="submit" class="submit-btn">Add</button>
+        </form>
+
         <div v-for="(exercise, idx) in workout" :key="exercise.name + idx" class="workout-grid-row">
           <div class="grid-name">
             <p>{{ exercise.name }}</p>
@@ -289,7 +319,7 @@ const values = reactive({
               <i class="fa-regular fa-circle-question"></i>
             </button>
           </div>
-          
+
           <input v-model="workout[idx].sets" type="text" :placeholder="exercise.sets + ' sets'" />
           <input v-model="workout[idx].reps" type="text" :placeholder="exercise.reps + ' reps'" />
           <input
@@ -302,8 +332,8 @@ const values = reactive({
       </div>
 
       <div class="card workout-btns">
-         <button @click="() => props.handleSaveWorkout(workout)">
-          Add Workout
+        <button @click="() => EditAndAddForm((prev) => !prev)">
+          Add & Edit
           <i class="fa-solid fa-save"></i>
         </button>
         <button @click="() => props.handleSaveWorkout(workout)">

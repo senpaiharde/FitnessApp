@@ -210,6 +210,7 @@ function handleAddWorkout(value) {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
+      :handleAddWorkout="handleAddWorkout"
       :timerData="appData.timerData"
       :steps="appData.steps"
       :workoutData="appData.workoutData"
