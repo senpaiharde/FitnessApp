@@ -14,15 +14,17 @@ const props = defineProps({
   handleSaveWorkout: Function,
 });
 const workoutTypes = ['push', 'pull', 'legs'];
-const workout = computed(() => workoutProgram[props.selectedWorkout]?.workout || []);
+const workout = computed(() => props.workoutData?.[props.selectedWorkout] || []);
 const warmup = computed(() => workoutProgram[props.selectedWorkout]?.warmup || []);
 let selectedExercise = ref(null);
+console.log(workout, warmup, 'data');
+
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 console.log('Selected workout:', props.selectedWorkout, 'Workout data:', props.workoutData);
 console.log(workout.value, 'this is workout');
 const day = props.selectedWorkout + 1;
 
-let timers = reactive(props.timerData || {});
+let timers = reactive({ ...props.timerData } || {});
 let time = ref(0);
 let minute = ref(0);
 let hour = ref(0);
@@ -37,6 +39,7 @@ console.log(
 
 const reactiveData = toRef(props, 'workoutData');
 const data = computed(() => reactiveData.value);
+console.log(data.value, 'data', props, 'while props');
 onMounted(() => {
   const saved = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
   time.value = saved.time || 0;
@@ -44,13 +47,14 @@ onMounted(() => {
   hour.value = saved.hour || 0;
 
   localSteps.value = props.steps || 0;
-  console.log('Mounted workout, preloaded values:', data[props.selectedWorkout]);
+  console.log('Mounted workout, preloaded values:', data.value[props.selectedWorkout]);
 
-  const data = computed(() => data[props.selectedWorkout]);
-  for (const key in workout) {
-    workout[key].sets;
-    workout[key].reps;
-    workout[key].weight;
+  for (const key in workout.value) {
+    console.log(workout.value[key], workout.value[key], workout.value[key].sets);
+
+    workout.value[key].sets;
+    workout.value[key].reps;
+    workout.value[key].weight;
   }
 });
 watch(
@@ -140,20 +144,16 @@ if (!workout.value) {
   console.warn('Workout not initialized — probably missing from appData.workoutData');
 }
 
-console.log('[WORKOUT.vue] props.handleSaveWorkout =', props.handleSaveWorkout);
-watch(
-  () => props.selectedWorkout,
-  () => {
-    console.log('[DEBUG] Selected Workout Index:', props.selectedWorkout);
-    console.log('[DEBUG] workoutData at index:', props.workoutData?.[props.selectedWorkout]);
-    console.log('[DEBUG] Computed workout:', workout.value);
-  },
-  { immediate: true }
+console.log(
+  '[WORKOUT.vue] props.handleSaveWorkout =',
+  data.value,
+  props.selectedWorkout,
+  data.value.length > props.selectedWorkout ? 'yes' : ' no'
 );
 </script>
 
 <template>
-  <section v-if="props.selectedWorkout >= 0 && data[props.selectedWorkout]" id="workout-card">
+  <section id="workout-card">
     <Portal :onClose="() => (selectedExercise = null)" v-if="selectedExercise">
       <div class="exercise-description">
         <h3>{{ selectedExercise }}</h3>
@@ -303,17 +303,13 @@ watch(
       </div>
 
       <div class="card workout-btns">
-        <button
-          @click="
-            (() => console.log(props.handleSaveWorkout(workout)), props.handleSaveWorkout(workout))
-          "
-        >
+        <button @click="() => props.handleSaveWorkout(workout)">
           Save & Exit
           <i class="fa-solid fa-save"></i>
         </button>
         <button
           :disabled="!props.isWorkoutComplete"
-          @click="() => props.handleSaveWorkout(workout.value)"
+          @click="() => props.handleSaveWorkout(workout)"
         >
           Complete
           <i class="fa-solid fa-check"></i>

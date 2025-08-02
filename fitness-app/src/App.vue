@@ -67,15 +67,13 @@ const isWorkoutComplete = computed(() => {
   const curr = appData.workoutData[selectedWorkout.value];
   if (!Array.isArray(curr)) return false;
 
-  return curr.every(
-    (ex) =>
-      typeof ex.sets === 'string' &&
-      typeof ex.reps === 'string' &&
-      typeof ex.weight === 'string' &&
-      ex.sets.trim() !== '' &&
-      ex.reps.trim() !== '' &&
-      ex.weight.trim() !== ''
-  );
+  return curr.every((ex) => {
+    return (
+      String(ex.sets).trim() !== '' &&
+      String(ex.reps).trim() !== '' &&
+      String(ex.weight).trim() !== ''
+    );
+  });
 });
 const firstInCompletedWorkoutIndex = computed(() => {
   for (const [idx, workoutObj] of Object.entries(appData.workoutData)) {
@@ -83,12 +81,9 @@ const firstInCompletedWorkoutIndex = computed(() => {
 
     const allFilled = workoutObj.every(
       (ex) =>
-        typeof ex.sets === 'string' &&
-        typeof ex.reps === 'string' &&
-        typeof ex.weight === 'string' &&
-        ex.sets.trim() !== '' &&
-        ex.reps.trim() !== '' &&
-        ex.weight.trim() !== ''
+        String(ex.sets).trim() !== '' &&
+        String(ex.reps).trim() !== '' &&
+        String(ex.weight).trim() !== ''
     );
 
     if (!allFilled) return parseInt(idx);
@@ -97,6 +92,7 @@ const firstInCompletedWorkoutIndex = computed(() => {
 });
 
 function handleChangeDisplay(idx) {
+  console.log('switching page', idx);
   selectedDisplay.value = idx;
 }
 
@@ -140,6 +136,7 @@ function handleSaveWorkout(value) {
     completedCount: appData.completedCount,
     workoutHistory,
   });
+  console.log((selectedDisplay.value = 2), 'swiching pages');
   selectedDisplay.value = 2; // Switch back to Dashboard display
 
   selectedWorkout.value = -1; // Reset selected workout
@@ -200,6 +197,7 @@ function handleSaveSteps(value) {
       :handleSaveWorkout="handleSaveWorkout"
       :selectedWorkout="selectedWorkout"
       v-if="selectedDisplay === 3 && selectedWorkout >= 0"
+      @finishWorkout="selectedDisplay = 2"
     />
     <!-- The Workout component will be displayed after the Dashboard component -->
 
