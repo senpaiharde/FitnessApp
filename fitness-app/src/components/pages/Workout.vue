@@ -4,7 +4,7 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 
 const props = defineProps({
-    isAnimating: Object,
+  isAnimating: Object,
   handleDeleteExercise: Function,
   handleAddWorkout: Function,
   handleSaveSteps: Function,
@@ -151,7 +151,12 @@ const values = reactive({
 });
 
 const EditAndAddForm = ref(false);
-
+const ButtonsReady = ref(false);
+console.log(ButtonsReady.value, 'here');
+setTimeout(() => {
+  ButtonsReady.value = true;
+  console.log(ButtonsReady.value, 'here');
+}, 2500);
 function handleSaveNewWorkout(value) {
   props.handleAddWorkout({ ...value });
   EditAndAddForm(false);
@@ -332,9 +337,17 @@ function handleSaveNewWorkout(value) {
       </div>
 
       <div class="card workout-btns">
-        <button @click="EditAndAddForm = !EditAndAddForm">
-          {{ EditAndAddForm ? 'Done' : 'Add & Edit' }}
-          <i class="fa-solid fa-save"></i>
+        <button :disabled="!ButtonsReady" @click="EditAndAddForm = !EditAndAddForm">
+          <span v-if="!ButtonsReady">
+            Loading...
+            <i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.5rem"></i>
+          </span>
+          <span v-else>
+            {{ EditAndAddForm ? 'Done' : 'Add & Edit' }}
+            <i class="fa-solid fa-save"></i>
+          </span>
+
+         
         </button>
         <button @click="() => props.handleSaveWorkout(workout)">
           Save & Exit

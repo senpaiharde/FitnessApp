@@ -207,12 +207,12 @@ function handleDeleteExercise(exerciseIndex) {
   });
 }
 
-const isAnimating = ref(false);
+
 </script>
 
 <template>
   <Layouts
-    :isAnimating="isAnimating"
+   
     :appData="appData"
     :selectedDisplay="selectedDisplay"
     :handleChangeDisplay="handleChangeDisplay"
@@ -227,7 +227,7 @@ const isAnimating = ref(false);
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
-      :isAnimating="isAnimating"
+    
       :handleDeleteExercise="handleDeleteExercise"
       :handleAddWorkout="handleAddWorkout"
       :timerData="appData.timerData"
