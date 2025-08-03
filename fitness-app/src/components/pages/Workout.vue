@@ -159,7 +159,11 @@ setTimeout(() => {
 }, 2500);
 function handleSaveNewWorkout(value) {
   props.handleAddWorkout({ ...value });
-  EditAndAddForm(false);
+  EditAndAddForm.value = false;
+  ButtonsReady.value = false;
+  setTimeout(() => {
+    ButtonsReady.value = true;
+  }, 1500);
   values.name = '';
   values.sets = '';
   values.reps = '';
@@ -346,8 +350,6 @@ function handleSaveNewWorkout(value) {
             {{ EditAndAddForm ? 'Done' : 'Add & Edit' }}
             <i class="fa-solid fa-save"></i>
           </span>
-
-         
         </button>
         <button @click="() => props.handleSaveWorkout(workout)">
           Save & Exit
