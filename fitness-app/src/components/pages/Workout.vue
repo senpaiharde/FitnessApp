@@ -286,28 +286,21 @@ function handleSaveNewWorkout(value) {
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </h6>
-
-        <form
-          @submit.prevent="handleSaveNewWorkout(values)"
-          class="workout-grid-row"
-          v-if="EditAndAddForm"
-        >
-        
-          <div class="grid-name">
-            <button type="submit" class="submit-btn">Add</button>
-            <input v-model="values.name" placeholder="Exercise Name" required />
-
-            <button>
-              <i class="fa-regular fa-circle-question"></i>
-            </button>
-          </div>
-          <input v-model="values.sets" type="text" placeholder="Sets" />
-          <input v-model="values.reps" type="text" placeholder="Reps" />
-          <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
-
-          
-        </form>
-
+        <transition name="slide-fade">
+          <form
+            @submit.prevent="handleSaveNewWorkout(values)"
+            class="workout-grid-row"
+            v-if="EditAndAddForm"
+          >
+            <div class="grid-name">
+              <button type="submit" class="submit-btn">Add</button>
+              <input v-model="values.name" placeholder="Exercise Name" required />
+            </div>
+            <input v-model="values.sets" type="text" placeholder="Sets" />
+            <input v-model="values.reps" type="text" placeholder="Reps" />
+            <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
+          </form>
+        </transition>
         <div v-for="(exercise, idx) in workout" :key="exercise.name + idx" class="workout-grid-row">
           <div class="grid-name">
             <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(idx)">
@@ -359,6 +352,22 @@ function handleSaveNewWorkout(value) {
 </template>
 
 <style scoped>
+/* Smooth slide open animation */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 1.5s ease;
+  overflow: hidden;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+.slide-fade-enter-to,
+.slide-fade-leave-from {
+  max-height: 500px; /* Enough height to fully show the form */
+  opacity: 1;
+}
 @media screen and (max-width: 500px) {
   .plan-card-header {
     flex-direction: column;
@@ -398,8 +407,10 @@ function handleSaveNewWorkout(value) {
 #workout-card,
 .plan-card {
   display: flex;
+
   flex-direction: column;
 }
+
 #workout-card {
   gap: 1.5rem;
 }

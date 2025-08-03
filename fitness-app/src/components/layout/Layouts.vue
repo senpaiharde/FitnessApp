@@ -47,7 +47,7 @@ function getDuration(height) {
 function enter(el, done) {
   const height = el.scrollHeight;
   const duration = getDuration(height);
-
+  const buffer = 2500;
   el.style.overflow = 'hidden';
 
   el.style.maxHeight = '0px';
@@ -57,7 +57,15 @@ function enter(el, done) {
     el.style.maxHeight = height + 'px';
   });
 
-  setTimeout(done, duration);
+  setTimeout(() => {
+    done(); // Vue marks transition as done
+
+    // Wait a bit longer to unlock full natural height
+    setTimeout(() => {
+      el.style.maxHeight = 'none';
+      el.style.overflow = 'visible';
+    }, buffer);
+  }, duration);
 }
 
 function leave(el, done) {
