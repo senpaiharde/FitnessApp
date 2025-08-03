@@ -193,7 +193,6 @@ function handleAddWorkout(value) {
   });
 }
 
-
 function handleDeleteExercise(exerciseIndex) {
   const workoutIndex = selectedWorkout.value;
   const currentExercises = appData.workoutData[workoutIndex];
@@ -207,10 +206,13 @@ function handleDeleteExercise(exerciseIndex) {
     workoutHistory: appData.workoutHistory,
   });
 }
+
+const isAnimating = ref(false);
 </script>
 
 <template>
   <Layouts
+    :isAnimating="isAnimating"
     :appData="appData"
     :selectedDisplay="selectedDisplay"
     :handleChangeDisplay="handleChangeDisplay"
@@ -225,7 +227,8 @@ function handleDeleteExercise(exerciseIndex) {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
-    :handleDeleteExercise="handleDeleteExercise"
+      :isAnimating="isAnimating"
+      :handleDeleteExercise="handleDeleteExercise"
       :handleAddWorkout="handleAddWorkout"
       :timerData="appData.timerData"
       :steps="appData.steps"

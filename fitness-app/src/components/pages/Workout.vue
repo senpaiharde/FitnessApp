@@ -4,6 +4,7 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 
 const props = defineProps({
+    isAnimating: Object,
   handleDeleteExercise: Function,
   handleAddWorkout: Function,
   handleSaveSteps: Function,

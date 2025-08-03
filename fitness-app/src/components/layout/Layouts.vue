@@ -2,6 +2,7 @@
 import { ref, watch, computed, onMounted } from 'vue';
 
 const props = defineProps({
+  isAnimating: Object,
   handleChangeDisplay: Function,
   selectedDisplay: Number,
   appData: Object,
@@ -36,7 +37,7 @@ watch(
   },
   { immediate: true }
 );
-
+animation = props.isAnimating;
 function getDuration(height) {
   const baseHeight = 400;
   const baseDuration = 500;
@@ -48,6 +49,9 @@ function enter(el, done) {
   const height = el.scrollHeight;
   const duration = getDuration(height);
   const buffer = 2500;
+
+  animation.value = true;
+
   el.style.overflow = 'hidden';
 
   el.style.maxHeight = '0px';
@@ -64,6 +68,7 @@ function enter(el, done) {
     setTimeout(() => {
       el.style.maxHeight = 'none';
       el.style.overflow = 'visible';
+      animation.value = false;
     }, buffer);
   }, duration);
 }
