@@ -331,11 +331,9 @@ console.log(workout.value, 'workout');
         class="workout-grid"
       >
         <template #item="{ element, index }">
-          <div class="workout-grid-row">
+          <div class="workout-grid-row drag-handle cursor-grab">
             <div class="grid-name">
-              <button class="drag-handle cursor-grab">
-                <i class="fa-solid fa-up-down-left-right"></i>
-              </button>
+            
               <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(index)">
                 <i class="fa-solid fa-trash"></i>
               </button>
@@ -456,6 +454,7 @@ console.log(workout.value, 'workout');
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1rem;
   align-items: center;
+  cursor: grab;
 }
 .workout-grid-row,
 .workout-grid-line {
