@@ -318,6 +318,7 @@ console.log(workout.value, 'workout');
             <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
           </form>
         </transition>
+        </div>
         <draggable
           v-model="workout"
           :item-key="(item, index) => item?.name || index"
@@ -328,21 +329,15 @@ console.log(workout.value, 'workout');
           :item-tag="'div'"
           class="workout-grid"
         >
-          <template #item="{ element, idx }">
+          <template #item="{ element, index }">
             <div class="workout-grid-row">
               <div class="grid-name">
-                <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(idx)">
+                <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(index)">
                   <i class="fa-solid fa-trash"></i>
                 </button>
                 <p>{{ element.name }}</p>
 
-                <button
-                  @click="
-                    () => {
-                      selectedExercise = element.name;
-                    }
-                  "
-                >
+                <button @click="() => (selectedExercise = element.name)">
                   <i class="fa-regular fa-circle-question"></i>
                 </button>
               </div>
@@ -353,7 +348,7 @@ console.log(workout.value, 'workout');
             </div>
           </template>
         </draggable>
-      </div>
+      
 
       <div class="card workout-btns">
         <button :disabled="!ButtonsReady" @click="EditAndAddForm = !EditAndAddForm">
