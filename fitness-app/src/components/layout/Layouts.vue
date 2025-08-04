@@ -1,12 +1,22 @@
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue';
-
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUp,
+  useClerk,
+  UserButton,
+  useUser,
+  SignOutButton,
+} from '@clerk/vue';
 const props = defineProps({
-  
   handleChangeDisplay: Function,
   selectedDisplay: Number,
   appData: Object,
 });
+const { openSignIn, isSignedIn } = useClerk();
+const { user } = useUser();
 const hasSaved = computed(() => {
   return Object.keys(props.appData.workoutData).length > 0;
 });
@@ -90,6 +100,22 @@ function leave(el, done) {
   <header>
     <div class="HeaderTop">
       <h1>Fitness App</h1>
+
+      <div class="login-container">
+        <SignedOut>
+          <SignInButton>Log in</SignInButton>
+        </SignedOut>
+
+        <SignedIn>
+          <UserButton />
+
+          <SignOutButton>Log out</SignOutButton>
+        </SignedIn>
+
+        <p>
+          {{ user ? 'Welcome, ' + user.firstName : 'Please sign in' }}
+        </p>
+      </div>
       <div>
         <button @click="() => handleChangeDisplay(4)">Dashboard</button>
         <button @click="() => handleChangeDisplay(2)" class="HeaderButton">Workout</button>
