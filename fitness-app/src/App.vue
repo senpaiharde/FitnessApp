@@ -207,12 +207,20 @@ function handleDeleteExercise(exerciseIndex) {
   });
 }
 
+function handleReorderWorkout(updatedList) {
+  console.log(updatedList, 'yes');
+  appData.workoutData[selectedWorkout.value] = updatedList;
 
+  updateAppData({
+    workoutData: appData.workoutData,
+    workoutHistory: appData.workoutHistory,
+    completedCount: appData.completedCount,
+  });
+}
 </script>
 
 <template>
   <Layouts
-   
     :appData="appData"
     :selectedDisplay="selectedDisplay"
     :handleChangeDisplay="handleChangeDisplay"
@@ -227,7 +235,7 @@ function handleDeleteExercise(exerciseIndex) {
     />
     <!-- The Dashboard component will be displayed after the Welcome component -->
     <Workout
-    
+      :handleReorderWorkout="handleReorderWorkout"
       :handleDeleteExercise="handleDeleteExercise"
       :handleAddWorkout="handleAddWorkout"
       :timerData="appData.timerData"

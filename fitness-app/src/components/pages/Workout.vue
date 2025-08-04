@@ -5,7 +5,7 @@ import Portal from '../Portal.vue';
 import draggable from 'vuedraggable';
 import draggableComponent from 'vuedraggable';
 const props = defineProps({
-  isAnimating: Object,
+  handleReorderWorkout: Function,
   handleDeleteExercise: Function,
   handleAddWorkout: Function,
   handleSaveSteps: Function,
@@ -318,37 +318,40 @@ console.log(workout.value, 'workout');
             <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
           </form>
         </transition>
-        </div>
-        <draggable
-          v-model="workout"
-          :item-key="(item, index) => item?.name || index"
-          ghost-class="drag-ghost"
-          handle=".drag-handle"
-          animation="200"
-          :tag="'div'"
-          :item-tag="'div'"
-          class="workout-grid"
-        >
-          <template #item="{ element, index }">
-            <div class="workout-grid-row">
-              <div class="grid-name">
-                <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(index)">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-                <p>{{ element.name }}</p>
+      </div>
+      <draggable
+        @update="() => props.handleReorderWorkout(workout)"
+        v-model="workout"
+        :item-key="(item, index) => item?.name || index"
+        ghost-class="drag-ghost"
+        handle=".drag-handle"
+        animation="200"
+        :tag="'div'"
+        :item-tag="'div'"
+        class="workout-grid"
+      >
+        <template #item="{ element, index }">
+          <div class="workout-grid-row">
+            <div class="grid-name">
+              <button class="drag-handle cursor-grab">
+                <i class="fa-solid fa-up-down-left-right"></i>
+              </button>
+              <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(index)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <p>{{ element.name }}</p>
 
-                <button @click="() => (selectedExercise = element.name)">
-                  <i class="fa-regular fa-circle-question"></i>
-                </button>
-              </div>
-
-              <input v-model="element.sets" type="text" :placeholder="element.sets + ' sets'" />
-              <input v-model="element.reps" type="text" :placeholder="element.reps + ' reps'" />
-              <input v-model="element.weight" class="grid-weights" type="text" placeholder="23Kg" />
+              <button @click="() => (selectedExercise = element.name)">
+                <i class="fa-regular fa-circle-question"></i>
+              </button>
             </div>
-          </template>
-        </draggable>
-      
+
+            <input v-model="element.sets" type="text" :placeholder="element.sets + ' sets'" />
+            <input v-model="element.reps" type="text" :placeholder="element.reps + ' reps'" />
+            <input v-model="element.weight" class="grid-weights" type="text" placeholder="23Kg" />
+          </div>
+        </template>
+      </draggable>
 
       <div class="card workout-btns">
         <button :disabled="!ButtonsReady" @click="EditAndAddForm = !EditAndAddForm">
