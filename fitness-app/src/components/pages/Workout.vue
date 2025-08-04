@@ -2,7 +2,8 @@
 import { computed, onMounted, ref, watch, reactive, toRef } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
-
+import draggable from 'vuedraggable';
+import draggableComponent from 'vuedraggable';
 const props = defineProps({
   isAnimating: Object,
   handleDeleteExercise: Function,
@@ -17,7 +18,12 @@ const props = defineProps({
   handleSaveWorkout: Function,
 });
 const workoutTypes = ['push', 'pull', 'legs'];
-const workout = computed(() => props.workoutData?.[props.selectedWorkout] || []);
+const workout = computed({
+  get: () => props.workoutData?.[props.selectedWorkout] || [],
+  set: (newValue) => {
+    props.workoutData[props.selectedWorkout] = newValue;
+  },
+});
 const warmup = computed(() => workoutProgram[props.selectedWorkout]?.warmup || []);
 let selectedExercise = ref(null);
 console.log(workout, warmup, 'data');
@@ -169,6 +175,7 @@ function handleSaveNewWorkout(value) {
   values.reps = '';
   values.weight = '';
 }
+console.log(workout.value, 'workout');
 </script>
 
 <template>
@@ -311,33 +318,41 @@ function handleSaveNewWorkout(value) {
             <input v-model="values.weight" class="grid-weights" type="text" placeholder="23Kg" />
           </form>
         </transition>
-        <div v-for="(exercise, idx) in workout" :key="exercise.name + idx" class="workout-grid-row">
-          <div class="grid-name">
-            <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(idx)">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-            <p>{{ exercise.name }}</p>
+        <draggable
+          v-model="workout"
+          :item-key="(item, index) => item?.name || index"
+          ghost-class="drag-ghost"
+          handle=".drag-handle"
+          animation="200"
+          :tag="'div'"
+          :item-tag="'div'"
+          class="workout-grid"
+        >
+          <template #item="{ element, idx }">
+            <div class="workout-grid-row">
+              <div class="grid-name">
+                <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(idx)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+                <p>{{ element.name }}</p>
 
-            <button
-              @click="
-                () => {
-                  selectedExercise = exercise.name;
-                }
-              "
-            >
-              <i class="fa-regular fa-circle-question"></i>
-            </button>
-          </div>
+                <button
+                  @click="
+                    () => {
+                      selectedExercise = element.name;
+                    }
+                  "
+                >
+                  <i class="fa-regular fa-circle-question"></i>
+                </button>
+              </div>
 
-          <input v-model="workout[idx].sets" type="text" :placeholder="exercise.sets + ' sets'" />
-          <input v-model="workout[idx].reps" type="text" :placeholder="exercise.reps + ' reps'" />
-          <input
-            v-model="workout[idx].weight"
-            class="grid-weights"
-            type="text"
-            placeholder="23Kg"
-          />
-        </div>
+              <input v-model="element.sets" type="text" :placeholder="element.sets + ' sets'" />
+              <input v-model="element.reps" type="text" :placeholder="element.reps + ' reps'" />
+              <input v-model="element.weight" class="grid-weights" type="text" placeholder="23Kg" />
+            </div>
+          </template>
+        </draggable>
       </div>
 
       <div class="card workout-btns">
