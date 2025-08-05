@@ -111,10 +111,6 @@ function leave(el, done) {
 
           <SignOutButton>Log out</SignOutButton>
         </SignedIn>
-
-        <p>
-          {{ user ? 'Welcome, ' + user.firstName : 'Please sign in' }}
-        </p>
       </div>
       <div>
         <button @click="() => handleChangeDisplay(4)">Dashboard</button>
@@ -143,6 +139,12 @@ function leave(el, done) {
 </template>
 
 <style scoped>
+.login-container{
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    gap: 10px;
+}
 .HeaderButton {
   margin-left: 0.5rem;
 }

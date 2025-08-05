@@ -164,7 +164,7 @@ watch(selectedMetric, (newList) => {
         </thead>
         <tbody>
           <tr v-for="(user, index) in filterTopUsers" :key="index">
-            <td>{{ index + 1 }}</td>
+            <td class="tdDisplay">{{ index + 1 }}  <UserButton /></td>
             <td>{{ user.name }}</td>
             <td>{{ user.totalWorkouts }}</td>
             <td>{{ user.totalSteps }}</td>
@@ -173,25 +173,16 @@ watch(selectedMetric, (newList) => {
         </tbody>
       </table>
     </div>
-    <div class="login-container">
-      <SignedOut>
-        <SignInButton>Log in</SignInButton>
-      </SignedOut>
-
-      <SignedIn>
-        <UserButton />
-
-        <SignOutButton>Log out</SignOutButton>
-      </SignedIn>
-
-      <p>
-        {{ user ? 'Welcome, ' + user.firstName : 'Please sign in' }}
-      </p>
-    </div>
+    
   </section>
 </template>
 
 <style scoped>
+.tdDisplay{
+    display: flex;
+    gap: 8px;
+    align-self: center;
+}
 .top-table {
   width: 100%;
   overflow-x: auto;
