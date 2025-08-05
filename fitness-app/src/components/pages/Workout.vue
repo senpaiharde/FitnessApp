@@ -4,6 +4,7 @@ import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 import draggable from 'vuedraggable';
 import draggableComponent from 'vuedraggable';
+import Warmup from '../sideComponents/Warmup.vue';
 const props = defineProps({
   handleReorderWorkout: Function,
   handleDeleteExercise: Function,
@@ -26,7 +27,6 @@ const workout = computed({
 });
 const warmup = computed(() => workoutProgram[props.selectedWorkout]?.warmup || []);
 let selectedExercise = ref(null);
-console.log(workout, warmup, 'data');
 
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);
 console.log('Selected workout:', props.selectedWorkout, 'Workout data:', props.workoutData);
@@ -274,24 +274,7 @@ console.log(workout.value, 'workout');
         <h6>sets</h6>
         <h6>reps</h6>
         <h6>weights</h6>
-        <div v-for="(exercise, idx) in warmup" :key="exercise.name + idx" class="workout-grid-row">
-          <div class="grid-name">
-            <p>{{ exercise.name }}</p>
-            <button
-              @click="
-                () => {
-                  selectedExercise = exercise.name;
-                }
-              "
-            >
-              <i class="fa-regular fa-circle-question"></i>
-            </button>
-          </div>
-          <p>{{ exercise?.sets || '-' }}</p>
-          <p>{{ exercise.reps || '-' }}</p>
-
-          <input class="grid-weights" type="text" placeholder="23Kg" disabled />
-        </div>
+        <Warmup :selectedWorkout="props.selectedWorkout" />
 
         <div class="workout-grid-line"></div>
         <h4 class="grid-name">Workout</h4>
@@ -333,7 +316,6 @@ console.log(workout.value, 'workout');
         <template #item="{ element, index }">
           <div class="workout-grid-row drag-handle cursor-grab">
             <div class="grid-name">
-            
               <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(index)">
                 <i class="fa-solid fa-trash"></i>
               </button>
