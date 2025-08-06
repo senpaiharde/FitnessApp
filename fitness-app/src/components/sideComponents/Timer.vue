@@ -128,7 +128,13 @@ function saveTime() {
   hour.value = tempHour.value;
   minute.value = tempMinute.value;
   time.value = tempTime.value;
+  timers[props.selectedWorkout] = {
+    time: time.value,
+    minute: minute.value,
+    hour: hour.value,
+  };
   props.handleSaveTimerData(timers);
+ 
   EditTime.value = false;
 }
 </script>
