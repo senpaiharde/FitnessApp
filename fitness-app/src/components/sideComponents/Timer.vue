@@ -119,7 +119,17 @@ const saveSteps = () => {
 
 const isEditMode = ref(false);
 const EditTime = ref(false);
-console.log(EditTime, 'timer');
+
+const tempHour = ref(hour.value);
+const tempMinute = ref(minute.value);
+const tempTime = ref(time.value);
+
+function saveTime() {
+  hour.value = tempHour.value;
+  minute.value = tempMinute.value;
+  time.value = tempTime.value;
+  EditTime.value = false;
+}
 </script>
 
 <template>
@@ -177,13 +187,17 @@ console.log(EditTime, 'timer');
             {{ time < 10 ? '0' + time : time }}
           </div>
         </button>
-        <button  class="time" v-else>
-            <div>
-            </div>
-          <input :value="hour < 10 ? '0' + hour : hour" type="number" />
-          <input :value="minute < 10 ? '0' + minute : minute" type="number" />
-          <input :value="time < 10 ? '0' + time : time" type="number" />
-        </button>
+        <div v-else class="time time-button time-edit">
+          <input v-model="tempHour" type="number" min="0" max="99" />
+          <span>:</span>
+          <input v-model="tempMinute" type="number" min="0" max="59" />
+          <span>:</span>
+          <input v-model="tempTime" type="number" min="0" max="59" />
+
+          <button @click="saveTime" class="save-btn">
+            <i class="fa-solid fa-check"></i>
+          </button>
+        </div>
       </div>
       <i class="fa-solid fa-dumbbell"></i>
     </div>
@@ -207,6 +221,44 @@ console.log(EditTime, 'timer');
 </template>
 
 <style scoped>
+.time-button {
+  padding: 0.3rem 0.7rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  background-color: #222;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: none;
+  cursor: pointer;
+}
+
+.time-edit {
+  gap: 0.4rem;
+}
+
+.time-edit input {
+  width: 2.3rem;
+  text-align: center;
+  font-size: 1rem;
+  padding: 2px 4px;
+  
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.save-btn {
+  background: transparent;
+  border: none;
+  color: #4caf50;
+  font-size: 1.1rem;
+ 
+  cursor: pointer;
+  padding-left: 0.4rem;
+}
 .exercise-btns {
   display: flex;
   justify-content: space-between;
