@@ -109,7 +109,6 @@ function stopTimer() {
 }
 const stepsPortal = ref(null);
 
-
 const saveSteps = () => {
   if (localSteps.value < 1) {
     console.warn('Please enter a valid number of steps.');
@@ -117,6 +116,10 @@ const saveSteps = () => {
   }
   props.handleSaveSteps(localSteps.value);
 };
+
+const isEditMode = ref(false);
+const EditTime = ref(false);
+console.log(EditTime, 'timer');
 </script>
 
 <template>
@@ -168,22 +171,33 @@ const saveSteps = () => {
           <i class="fa-solid fa-stop"></i>
         </button>
 
-        <button disabled class="time">
-          {{ hour < 10 ? '0' + hour : hour }}: {{ minute < 10 ? '0' + minute : minute }}:
-          {{ time < 10 ? '0' + time : time }}
+        <button v-if="!EditTime" @click="EditTime = !EditTime" class="time">
+          <div>
+            {{ hour < 10 ? '0' + hour : hour }}: {{ minute < 10 ? '0' + minute : minute }}:
+            {{ time < 10 ? '0' + time : time }}
+          </div>
+        </button>
+        <button  class="time" v-else>
+            <div>
+            </div>
+          <input :value="hour < 10 ? '0' + hour : hour" type="number" />
+          <input :value="minute < 10 ? '0' + minute : minute" type="number" />
+          <input :value="time < 10 ? '0' + time : time" type="number" />
         </button>
       </div>
       <i class="fa-solid fa-dumbbell"></i>
     </div>
 
     <h2 class="workoutName">{{ workoutTypes[props.selectedWorkout % 3] }} Workout</h2>
+    <button @click="isEditMode = !isEditMode">
+      {{ isEditMode ? 'Done Editing' : 'Edit Layout' }}
+    </button>
 
     <button
       v-if="workoutTypes[props.selectedWorkout % 3] === 'legs'"
       @click="
         () => {
           stepsPortal = true;
-         
         }
       "
     >

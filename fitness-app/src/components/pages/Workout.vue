@@ -76,9 +76,9 @@ console.log(workout.value, 'workout');
 const handleSkip = () => {
     console.log('fireing')
   workout.value.forEach((exercise) => {
-    exercise.sets = '';
-    exercise.reps = '';
-    exercise.weight = '';
+    exercise.sets = '1';
+    exercise.reps = '1';
+    exercise.weight = '1';
   });
   props.handleSaveWorkout(workout.value);
 };
