@@ -128,6 +128,7 @@ function saveTime() {
   hour.value = tempHour.value;
   minute.value = tempMinute.value;
   time.value = tempTime.value;
+  props.handleSaveTimerData(timers);
   EditTime.value = false;
 }
 </script>
@@ -221,6 +222,16 @@ function saveTime() {
 </template>
 
 <style scoped>
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide spinners for Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
 .time-button {
   padding: 0.3rem 0.7rem;
   font-size: 1rem;
@@ -244,7 +255,7 @@ function saveTime() {
   text-align: center;
   font-size: 1rem;
   padding: 2px 4px;
-  
+
   color: white;
   border: 1px solid #444;
   border-radius: 4px;
@@ -255,9 +266,12 @@ function saveTime() {
   border: none;
   color: #4caf50;
   font-size: 1.1rem;
- 
   cursor: pointer;
-  padding-left: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  height: 100%;
 }
 .exercise-btns {
   display: flex;
