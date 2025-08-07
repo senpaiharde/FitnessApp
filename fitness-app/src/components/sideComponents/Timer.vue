@@ -134,7 +134,7 @@ function saveTime() {
     hour: hour.value,
   };
   props.handleSaveTimerData(timers);
- 
+
   EditTime.value = false;
 }
 </script>
@@ -195,11 +195,23 @@ function saveTime() {
           </div>
         </button>
         <div v-else class="time time-button time-edit">
-          <input v-model="tempHour" type="number" min="0" max="99" />
+          <input
+            :value="tempHour"
+            @input="tempHour = clamp($event.target.value, 0, 99)"
+            type="number"
+          />
           <span>:</span>
-          <input v-model="tempMinute" type="number" min="0" max="59" />
+          <input
+            :value="tempMinute"
+            @input="tempMinute = clamp($event.target.value, 0, 59)"
+            type="number"
+          />
           <span>:</span>
-          <input v-model="tempTime" type="number" min="0" max="59" />
+          <input
+            :value="tempTime"
+            @input="tempTime = clamp($event.target.value, 0, 59)"
+            type="number"
+          />
 
           <button @click="saveTime" class="save-btn">
             <i class="fa-solid fa-check"></i>
