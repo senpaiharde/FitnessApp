@@ -102,6 +102,26 @@ watch(filterTopUsers, (newList) => {
 watch(selectedMetric, (newList) => {
   console.log('selectedMetric', newList, [...filterTopUsers.value, ...topUsers.value]);
 });
+let formattedTime = 0;
+console.log(
+  filterTopUsers.value.map((a) => {
+    console.log(a.timeSpent, 'a');
+    const totalSeconds = a.timeSpent;
+    const hour = Math.floor(totalSeconds / 3600);
+    const min = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    console.log(`${hour}h ${min}m ${seconds}s`, 'a');
+
+    return {
+      ...a,
+      formattedTime: `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(
+        seconds
+      ).padStart(2, '0')}`,
+    };
+  }),
+  'daddy'
+);
+console.log(formattedTime);
 </script>
 
 <template>
@@ -164,24 +184,31 @@ watch(selectedMetric, (newList) => {
         </thead>
         <tbody>
           <tr v-for="(user, index) in filterTopUsers" :key="index">
-            <td class="tdDisplay">{{ index + 1 }}  <UserButton /></td>
+            <td class="tdDisplay">{{ index + 1 }} <UserButton /></td>
             <td>{{ user.name }}</td>
             <td>{{ user.totalWorkouts }}</td>
             <td>{{ user.totalSteps }}</td>
-            <td>{{ user.timeSpent }}</td>
+            <td>
+              {{
+                String(Math.floor(user.timeSpent / 3600)).padStart(2, '0') +
+                ':' +
+                String(Math.floor((user.timeSpent % 3600) / 60)).padStart(2, '0') +
+                ':' +
+                String(Math.floor(user.timeSpent % 60)).padStart(2, '0')
+              }}
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-    
   </section>
 </template>
 
 <style scoped>
-.tdDisplay{
-    display: flex;
-    gap: 8px;
-    align-self: center;
+.tdDisplay {
+  display: flex;
+  gap: 8px;
+  align-self: center;
 }
 .top-table {
   width: 100%;
@@ -218,7 +245,6 @@ watch(selectedMetric, (newList) => {
 }
 
 .toggle-bar button {
-  
   color: white;
   border: none;
   padding: 0.5rem 1rem;
