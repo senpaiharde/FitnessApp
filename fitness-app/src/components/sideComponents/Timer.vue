@@ -137,6 +137,10 @@ function saveTime() {
 
   EditTime.value = false;
 }
+function clamp(value, min, max) {
+  const num = parseInt(value) || 0;
+  return Math.max(min, Math.min(max, num));
+}
 </script>
 
 <template>
