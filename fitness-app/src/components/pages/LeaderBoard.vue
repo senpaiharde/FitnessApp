@@ -189,13 +189,16 @@ console.log(formattedTime);
             <td>{{ user.totalWorkouts }}</td>
             <td>{{ user.totalSteps }}</td>
             <td>
-              {{
-                String(Math.floor(user.timeSpent / 3600)).padStart(2, '0') +
-                ':' +
-                String(Math.floor((user.timeSpent % 3600) / 60)).padStart(2, '0') +
-                ':' +
-                String(Math.floor(user.timeSpent % 60)).padStart(2, '0')
-              }}
+              <span v-if="user.timeSpent === 0"> 0 </span>
+              <span v-else>
+                {{
+                  String(Math.floor(user.timeSpent / 3600 / 24)).padStart(2, '0') +
+                  ':' +
+                  String(Math.floor((user.timeSpent % 3600) / 60)).padStart(2, '0') +
+                  ':' +
+                  String(Math.floor(user.timeSpent % 60)).padStart(2, '0')
+                }}
+              </span>
             </td>
           </tr>
         </tbody>
