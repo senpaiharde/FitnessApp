@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 interface AppData {
   timerData: Record<number, { time: number; minute: number; hour: number }> | null;
   workoutData: Record<string, any>;
@@ -8,21 +8,30 @@ interface AppData {
   workoutHistory?: Record<string, number>;
   timeHistory?: Record<string, number>;
 }
-const STORAGE_KEY = (uid) => `appData_${uid}`;
+const STORAGE_KEY = (uid: string) => `appData_${uid}`;
 const ANON_KEY = 'anonUserId';
 const USER_KEY = 'userId';
 const ALL_DATA_KEY = 'allAppData';
 
+function safeParse<T>(val: string | null, fallback: T): T {
+  if (!val) return fallback;
+  try {
+    return JSON.parse(val) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function getUserId() {
-  let id = localStorage.getItem(USER_KEY);
-  if (id) return id;
+  let userId = localStorage.getItem(USER_KEY);
+  if (userId) return userId;
 
   let anonId = localStorage.getItem(ANON_KEY);
-  if (anonId) return anonId;
+  if (!anonId) {
+    anonId = uuidv4();
+    localStorage.setItem(ANON_KEY, anonId);
+  }
 
-  anonId = v4();
-  localStorage.setItem(ANON_KEY, anonId);
-  localStorage.setItem(USER_KEY, anonId);
   return anonId;
 }
 
@@ -43,7 +52,7 @@ export function setSignedInUser(clerkUserId: string) {
   localStorage.setItem(USER_KEY, clerkUserId);
 }
 const userId = localStorage.getItem('userId') || localStorage.getItem('anonUserId');
-console.log('Using ID:', userId); // 🔍 debugging
+
 export function loadAppData(): AppData {
   const uid = getUserId();
   console.log('Loading app data for user:', uid);

@@ -24,16 +24,11 @@ let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
 let localSteps = ref(props.steps || 0);
-console.log(
-  'Workout component loaded with props:',
-  props.workoutData[props.selectedWorkout],
-  'Selected workout:',
-  props.selectedWorkout
-);
+
 
 const reactiveData = toRef(props, 'workoutData');
 const data = computed(() => reactiveData.value);
-console.log(data.value, 'data', props, 'while props');
+
 onMounted(() => {
   const saved = timers[props.selectedWorkout] || { time: 0, minute: 0, hour: 0 };
   time.value = saved.time || 0;
