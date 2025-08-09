@@ -40,44 +40,19 @@ export function enter(el) {
   el.style.transition = 'max-height 0.5s ease';
 }
 
-export function WorkoutDataDisplay({
-  timerData,
+export function WorkoutDataDisplay({ timerData, steps, completedCount }) {
+  const seconds = Object.values(timerData || {}).reduce((a, t) => a + (t?.time || 0), 0);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
 
-  firstInCompletedWorkoutIndex,
-  steps,
-  workoutData,
-}) {
-  const totalWorkouts = Object.keys(workoutData).length;
-
-  const timeSpent = Object.values(timerData).reduce((acc, curr) => {
-    return acc + (curr.time || 0) + (curr.minute || 0) * 60 + (curr.hour || 0) * 3600;
-  }, 0);
-
-  const totalTimesSpend = {
-    hours: Math.floor(timeSpent / 3600),
-    minutes: Math.floor((timeSpent % 3600) / 60),
-    seconds: timeSpent % 60,
-  };
   return [
     {
-      workout: 'Total Workouts',
-      classname: 'card-icon fa-solid fa-dumbbell',
-      value: firstInCompletedWorkoutIndex + 1 + ' / ' + totalWorkouts,
+      workout: 'Workouts Completed',
+      value: completedCount || 0,
+      classname: 'fa-solid fa-dumbbell',
     },
-    {
-      workout: 'Total Steps',
-      classname: 'card-icon fa-solid fa-weight-hanging',
-      value: steps.toLocaleString() + ' steps',
-    },
-    {
-      workout: 'Total Time',
-      classname: 'card-icon fa-solid fa-bolt',
-      value:
-        [
-          totalTimesSpend.hours,
-          totalTimesSpend.minutes < 10 ? '0' + totalTimesSpend.minutes : totalTimesSpend.minutes,
-          totalTimesSpend.seconds < 10 ? '0' + totalTimesSpend.seconds : totalTimesSpend.seconds,
-        ].join(':') + ' minutes',
-    },
+    { workout: 'Steps', value: steps || 0, classname: 'fa-solid fa-shoe-prints' },
+    { workout: 'Time Spent', value: `${h}h ${m}m ${s}s`, classname: 'fa-regular fa-clock' },
   ];
 }
