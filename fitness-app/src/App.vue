@@ -37,16 +37,42 @@ export const useAppStore = defineStore('app', {
       });
     },
     save(partial) {
-        updateAppData(partial);
-        this.timerData = {...(this.timerData || {}), ...(partial.timerData || {})};
-        this.workoutData = {...(this.workoutData || {}), ...(partial.workoutData || {})};
-        this.stepHistory = {...(this.stepHistory || {}), ...(partial.stepsHistory || {})};
-        this.workoutHistory = {...(this.workoutHistory || {}), ...(partial.workoutHistory || {})};
-        this.timeHistory = {...(this.timeHistory || {}), ...(partial.timeHistory || {})};
-        if(typeof partial.steps === 'numbers') this.steps = partial.steps;
-        if(typeof partial.completedCount === 'number') this.completedCount = partial.completedCount
+      updateAppData(partial);
+      this.timerData = { ...(this.timerData || {}), ...(partial.timerData || {}) };
+      this.workoutData = { ...(this.workoutData || {}), ...(partial.workoutData || {}) };
+      this.stepHistory = { ...(this.stepHistory || {}), ...(partial.stepsHistory || {}) };
+      this.workoutHistory = { ...(this.workoutHistory || {}), ...(partial.workoutHistory || {}) };
+      this.timeHistory = { ...(this.timeHistory || {}), ...(partial.timeHistory || {}) };
+      if (typeof partial.steps === 'numbers') this.steps = partial.steps;
+      if (typeof partial.completedCount === 'number') this.completedCount = partial.completedCount;
     },
-    incre
+    incrementWorkout(dataISO) {
+      this.workoutHistory[dataISO] = (this.workoutHistory[dataISO] || 0) + 1;
+      this.completedCount += 1;
+      this.save({ workoutData: this.timeHistory, completedCount: this.completedCount });
+    },
+
+    addSteps(dataISO, delta) {
+      this.steps = (this.steps || 0) + delta;
+      this.stepHistory[dataISO] = (this.stepHistory || 0) + delta;
+      this.save({ steps: this.steps, stepsHistory: this.stepHistory });
+    },
+    upsertTimer(key,seconds) { 
+        const h = Math.floor(seconds / 3600);
+        const  m = Math.floor((seconds % 3600) / 60 )
+        this.timerData[key] = {time : seconds , hour : h, minute : m};
+        this.save({timerData: this.timerData})
+    },
+    resetAll(){
+        this.timerData = {};
+        this.workoutData= {};
+        this.steps = 0;
+        this.completedCount = 0;
+        this.stepHistory = {};
+        this.workoutData = {};
+        this.timeHistory = {};
+        this.save({});
+    }
   },
 });
 
