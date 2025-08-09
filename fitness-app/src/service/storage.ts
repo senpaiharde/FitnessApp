@@ -36,22 +36,36 @@ export function getUserId() {
 }
 
 export function setSignedInUser(clerkUserId: string) {
-  const anon = localStorage.getItem(ANON_KEY);
-
-  console.log('Setting signed-in user:', clerkUserId, 'from anon:', anon);
-  if (anon) {
-    const oldKey = `appData_${anon}`;
-
-    const raw = localStorage.getItem(`appData_${anon}`);
-
-    if (raw) {
-      localStorage.setItem(`appData_${clerkUserId}`, raw);
-      localStorage.removeItem(ANON_KEY);
-    }
-  }
   localStorage.setItem(USER_KEY, clerkUserId);
+
+  const anon = localStorage.getItem(ANON_KEY);
+  if (anon) {
+    const anonData = safeParse<AppData>(localStorage.getItem(STORAGE_KEY(anon)), {
+      timerData: {},
+      workoutData: {},
+      steps: 0,
+      completedCount: 0,
+    } as any);
+    const current = safeParse<AppData>(localStorage.getItem(STORAGE_KEY(clerkUserId)), {
+      timerData: {},
+      workoutData: {},
+      steps: 0,
+      completedCount: 0,
+    } as any);
+
+    const merged: AppData = {
+      timerData: { ...current.timerData, ...anonData.timerData },
+      workoutData: { ...current.workoutData, ...anonData.workoutData },
+      steps: (current.steps || 0) + (anonData.steps || 0),
+      completedCount: (current.completedCount || 0) + (anonData.completedCount || 0),
+      stepHistory: { ...(current.stepHistory || {}), ...(anonData.stepHistory || {}) },
+      workoutHistory: { ...(current.workoutHistory || {}), ...(anonData.workoutHistory || {}) },
+      timeHistory: { ...(current.timeHistory || {}), ...(anonData.timeHistory || {}) },
+    };
+    localStorage.setItem(STORAGE_KEY(clerkUserId), JSON.stringify(merged))
+    localStorage.removeItem(STORAGE_KEY(anon))
+  }
 }
-const userId = localStorage.getItem('userId') || localStorage.getItem('anonUserId');
 
 export function loadAppData(): AppData {
   const uid = getUserId();
