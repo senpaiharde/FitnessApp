@@ -1,4 +1,6 @@
-export const useAppStore = defineStore('app', {
+import { defineProps } from 'vue';
+
+export const useAppStore = defineProps('app', {
   state: () => ({
     timerData: {}, // { [workoutKey]: { time, hour, minute } }
     workoutData: {}, // { [workoutIndex]: Exercise[] }

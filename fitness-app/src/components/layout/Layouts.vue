@@ -10,13 +10,14 @@ import {
   useUser,
   SignOutButton,
 } from '@clerk/vue';
+import { useAppStore } from '../../utils/app';
+
 const props = defineProps({
-  handleChangeDisplay: Function,
-  selectedDisplay: Number,
-  appData: Object,
+  handleRestPlan: Function,
+  firstInCompletedWorkoutIndex: Number,
+  handleSelectWorkout: Function,
 });
-const { openSignIn, isSignedIn } = useClerk();
-const { user } = useUser();
+const store = useAppStore;
 const hasSaved = computed(() => {
   return Object.keys(props.appData.workoutData).length > 0;
 });
@@ -139,11 +140,11 @@ function leave(el, done) {
 </template>
 
 <style scoped>
-.login-container{
-    display: flex;
-    align-self: center;
-    justify-content: center;
-    gap: 10px;
+.login-container {
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  gap: 10px;
 }
 .HeaderButton {
   margin-left: 0.5rem;

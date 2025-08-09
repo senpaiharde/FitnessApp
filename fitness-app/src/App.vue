@@ -8,9 +8,9 @@ import LeaderBoard from './components/pages/LeaderBoard.vue';
 import { ref, computed, onMounted } from 'vue';
 import { workoutProgram } from './utils';
 import { removeAppdata } from './service/storage';
-import { useAppStore } from '@/stores/app';
+import { useAppStore } from './utils/app';
 
-const store = useAppStore();
+const store = useAppStore;
 
 const selectedDisplay = ref(1);
 const selectedWorkout = ref(-1);

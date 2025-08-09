@@ -1,15 +1,35 @@
 <script setup>
-import { gymHealthFacts } from '../../utils/index';
+import { computed, ref } from 'vue';
+
 import Grid from '../Grid.vue';
+import { gymHealthFacts } from '../../utils';
 
 const props = defineProps({
-  handleSelectWorkout: Function,
+  handleSelectWorkout: Number,
   firstInCompletedWorkoutIndex: Number,
   handleRestPlan: Function,
 });
-console.log('Dashboard component loaded', props);
 
-const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.length)];
+// stable “daily tip” (same tip for the whole day)
+const facts = gymHealthFacts;
+const dayKey = new Date().toDateString();
+const dailyIndex =
+  Math.abs(dayKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % facts.length;
+const randomFact = ref(facts[dailyIndex]);
+
+// compute safe start index (fallback to 0)
+const startIndex = computed(() =>
+  typeof props.firstInCompletedWorkoutIndex === 'number' && props.firstInCompletedWorkoutIndex >= 0
+    ? props.firstInCompletedWorkoutIndex
+    : 0
+);
+
+// never put inline arrows in template
+function startWorkout() {
+  if (typeof props.handleSelectWorkout === 'function') {
+    props.handleSelectWorkout(startIndex.value);
+  }
+}
 </script>
 
 <template>
@@ -18,41 +38,41 @@ const randomFact = gymHealthFacts[Math.floor(Math.random() * gymHealthFacts.leng
       <h2>Welcome Natty</h2>
       <div>
         <p class="tip">
-          <strong> Daily Tip</strong> <br />
+          <strong>Daily Tip</strong><br />
           {{ randomFact }}
         </p>
       </div>
-      <button @click="() => handleSelectWorkout(firstInCompletedWorkoutIndex < 0 ? 0 : firstInCompletedWorkoutIndex)">Start Workout &rarr;</button>
+      <button @click="startWorkout">Start Workout →</button>
     </div>
-    <Grid  v-bind="props" />
+
+    <Grid
+      :handle-select-workout="props.handleSelectWorkout"
+      :first-in-completed-workout-index="props.firstInCompletedWorkoutIndex"
+      :handle-rest-plan="props.handleRestPlan"
+    />
   </section>
 </template>
 
 <style scoped>
 .tip-container,
-    .tip-container div,
-    #dashboard {
-        display: flex;
-        
-    }
-
-    .tip-container,
-    #dashboard {
-        flex-direction: column;
-    }
-
-    #dashboard {
-        gap: 2rem;
-    }
-
-    .tip-container {
-        gap: 0.5rem;
-        border: 1.5px solid var(--border-secondary);
-    }
-
-    @media (min-width: 640px) {
-        .tip-container {
-            gap: 1rem;
-        }
-    }
+.tip-container div,
+#dashboard {
+  display: flex;
+}
+.tip-container,
+#dashboard {
+  flex-direction: column;
+}
+#dashboard {
+  gap: 2rem;
+}
+.tip-container {
+  gap: 0.5rem;
+  border: 1.5px solid var(--border-secondary);
+}
+@media (min-width: 640px) {
+  .tip-container {
+    gap: 1rem;
+  }
+}
 </style>
