@@ -3,12 +3,53 @@ import Layouts from './components/layout/Layouts.vue';
 import Welcome from './components/pages/Welcome.vue';
 import Dashboard from './components/pages/Dashboard.vue';
 import Workout from './components/pages/Workout.vue';
-
+import { defineStore } from 'pinia';
 import { ref, computed, onMounted, reactive } from 'vue';
 import { workoutProgram } from './utils';
-import { loadAppData, removeAppdata, updateAppData } from './service/storage';
+import { loadAllAppData, loadAppData, removeAppdata, updateAppData } from './service/storage';
 import LeaderBoard from './components/pages/LeaderBoard.vue';
 import { formatISO } from 'date-fns';
+
+export const useAppStore = defineStore('app', {
+  state: () => ({
+    timerData: {},
+    workoutData: {},
+    steps: 0,
+    completedCount: 0,
+    stepHistory: {},
+    workoutHistory: {},
+    timeHistory: {},
+  }),
+  getters: {
+    totalSeconds: (s) => Object.values(s.timerData || {}).reduce((a, t) => a + (t?.time || 0), 0),
+  },
+  actions: {
+    init() {
+      const loaded = loadAppData();
+      Object.assign(this, {
+        timerData: loaded.timerData || {},
+        workoutData: loaded.workoutData || {},
+        steps: loaded.steps || 0,
+        completedCount: loaded.completedCount || 0,
+        stepHistory: loaded.stepHistory || {},
+        workoutHistory: loaded.workoutHistory || {},
+        timeHistory: loaded.timeHistory || {},
+      });
+    },
+    save(partial) {
+        updateAppData(partial);
+        this.timerData = {...(this.timerData || {}), ...(partial.timerData || {})};
+        this.workoutData = {...(this.workoutData || {}), ...(partial.workoutData || {})};
+        this.stepHistory = {...(this.stepHistory || {}), ...(partial.stepsHistory || {})};
+        this.workoutHistory = {...(this.workoutHistory || {}), ...(partial.workoutHistory || {})};
+        this.timeHistory = {...(this.timeHistory || {}), ...(partial.timeHistory || {})};
+        if(typeof partial.steps === 'numbers') this.steps = partial.steps;
+        if(typeof partial.completedCount === 'number') this.completedCount = partial.completedCount
+    },
+    incre
+  },
+});
+
 const defaultData = {};
 for (let workoutIdx in workoutProgram) {
   const index = Number(workoutIdx);
