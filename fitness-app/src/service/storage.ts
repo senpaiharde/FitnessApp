@@ -104,7 +104,6 @@ export function updateAllUserData() {
   all[uid] = loadAppData();
   localStorage.setItem(ALL_DATA_KEY, JSON.stringify(all));
 }
-
-export function loadAllAppData() {
-  return JSON.parse(localStorage.getItem(ALL_DATA_KEY) || '{}');
+export function loadAllAppData(): Record<string, AppData> {
+  return safeParse<Record<string, AppData>>(localStorage.getItem(ALL_DATA_KEY), {});
 }

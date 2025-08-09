@@ -3,30 +3,30 @@ import { loadAllAppData } from '../service/storage';
 import { ref } from 'vue';
 
 export function buildLeaderboard(user, limit = 10) {
-  const topUsers = ref([]);
-  const all = loadAllAppData();
-  const board = Object.entries(all).map(([uid, data]) => ({
-    userId: uid,
-    name: uid === user.value?.id ? user.value.firstName : 'Anonymous',
-    totalSteps: data.steps,
-    totalWorkouts: data.completedCount + 1,
-    stepsHistory: data.stepHistory || {},
-    workoutHistory: data.workoutHistory || {},
-    timeHistory: data.timeHistory || {},
-    timeSpent: Object.values(data.timerData || {}).reduce(
-      (sum, e) => sum + (e.time || 0) + (e.minute || 0) * 60 + (e.hour || 0) * 3600,
-      0
-    ),
-  }));
-  // sort & slice
-  const sorted = board.sort((a, b) => b.totalSteps - a.totalSteps).slice(0, limit);
+  const all = loadAllAppData() || {};
+  const board = Object.entries(all).map(([uid, data]) => {
+    const timeSpent = Object.values(data?.timerData || {}).reduce((acc, t) => acc + (t.time || 0));
+    const workouts = Object.values(data?.workoutHistory || {}).reduce((a, b) => a + b, 0);
+    const steps = Object.values(data?.steps || {}).reduce((a, b) => a + b, 0);
 
-  return sorted;
+    return {
+      userId: uid,
+      name: uid === (user.value?.id || '') ? user.value?.firstName || 'You' : 'Anonymous',
+      timeSpent,
+      totalWorkouts: data?.completedCount ?? workouts,
+      totalSteps: data?.steps ?? steps,
+    };
+  });
+  board.sort((a, b) => {
+    if (b.timeSpent !== a.timeSpent) return b.timeSpent - a.timeSpent;
+    if (b.totalWorkouts !== a.totalWorkouts) return b.totalWorkouts - a.totalWorkouts;
+    return (b.totalSteps = a.totalSteps);
+  });
 }
 
 export function leave(el) {
   el.style.maxHeight = el.scrollHeight + 'px';
-  el.offsetHeight;
+  void el.offsetHeight;
   el.style.maxHeight = '0px';
   el.style.transition = 'max-height 0.5s ease';
   el.style.overflow = 'hidden';
@@ -35,14 +35,14 @@ export function leave(el) {
 export function enter(el) {
   el.style.maxHeight = '0px';
   el.style.overflow = 'hidden';
-  el.offsetHeight;
+  void el.offsetHeight;
   el.style.maxHeight = el.scrollHeight + 'px';
   el.style.transition = 'max-height 0.5s ease';
 }
 
 export function WorkoutDataDisplay({
   timerData,
-  
+
   firstInCompletedWorkoutIndex,
   steps,
   workoutData,
