@@ -62,39 +62,35 @@ export function setSignedInUser(clerkUserId: string) {
       workoutHistory: { ...(current.workoutHistory || {}), ...(anonData.workoutHistory || {}) },
       timeHistory: { ...(current.timeHistory || {}), ...(anonData.timeHistory || {}) },
     };
-    localStorage.setItem(STORAGE_KEY(clerkUserId), JSON.stringify(merged))
-    localStorage.removeItem(STORAGE_KEY(anon))
+    localStorage.setItem(STORAGE_KEY(clerkUserId), JSON.stringify(merged));
+    localStorage.removeItem(STORAGE_KEY(anon));
   }
 }
 
 export function loadAppData(): AppData {
   const uid = getUserId();
-  console.log('Loading app data for user:', uid);
-  const raw = localStorage.getItem(STORAGE_KEY(uid));
-
-  return raw
-    ? (JSON.parse(raw) as AppData)
-    : {
-        timerData: null,
-        workoutData: {},
-        steps: 0,
-        completedCount: 0,
-        stepHistory: {},
-        workoutHistory: {},
-        timeHistory: {},
-      };
-}
-
-export function saveAppData(data: AppData) {
-  const uid = getUserId();
-  localStorage.setItem(STORAGE_KEY(uid), JSON.stringify(data));
-  updateAllUserData();
+  return safeParse<AppData>(localStorage.getItem(STORAGE_KEY(uid)), {
+    timerData: {},
+    workoutData: {},
+    steps: 0,
+    completedCount: 0,
+  } as any);
 }
 
 export function updateAppData(patch: Partial<AppData>) {
-  const Current = loadAppData();
-  const merged = { ...Current, ...patch };
-  saveAppData(merged);
+  const uid = getUserId();
+  const current = loadAppData();
+  const next: AppData = {
+    ...current,
+    ...patch,
+    timerData: { ...(current.timerData || {}), ...(patch.timerData || {}) },
+    workoutData: { ...(current.workoutData || {}), ...(patch.workoutData || {}) },
+    stepHistory: { ...(current.stepHistory || {}), ...(patch.stepHistory || {}) },
+    workoutHistory: { ...(current.workoutHistory || {}), ...(patch.workoutHistory || {}) },
+    timeHistory: { ...(current.timeHistory || {}), ...(patch.timeHistory || {}) },
+  };
+  localStorage.setItem(STORAGE_KEY(uid), JSON.stringify(next));
+  updateAllUserData();
 }
 
 export function removeAppdata() {
