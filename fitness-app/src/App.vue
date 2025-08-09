@@ -3,311 +3,164 @@ import Layouts from './components/layout/Layouts.vue';
 import Welcome from './components/pages/Welcome.vue';
 import Dashboard from './components/pages/Dashboard.vue';
 import Workout from './components/pages/Workout.vue';
-import { defineStore } from 'pinia';
-import { ref, computed, onMounted, reactive } from 'vue';
-import { workoutProgram } from './utils';
-import { loadAllAppData, loadAppData, removeAppdata, updateAppData } from './service/storage';
 import LeaderBoard from './components/pages/LeaderBoard.vue';
-import { formatISO } from 'date-fns';
 
-export const useAppStore = defineStore('app', {
-  state: () => ({
-    timerData: {},
-    workoutData: {},
-    steps: 0,
-    completedCount: 0,
-    stepHistory: {},
-    workoutHistory: {},
-    timeHistory: {},
-  }),
-  getters: {
-    totalSeconds: (s) => Object.values(s.timerData || {}).reduce((a, t) => a + (t?.time || 0), 0),
-  },
-  actions: {
-    init() {
-      const loaded = loadAppData();
-      Object.assign(this, {
-        timerData: loaded.timerData || {},
-        workoutData: loaded.workoutData || {},
-        steps: loaded.steps || 0,
-        completedCount: loaded.completedCount || 0,
-        stepHistory: loaded.stepHistory || {},
-        workoutHistory: loaded.workoutHistory || {},
-        timeHistory: loaded.timeHistory || {},
-      });
-    },
-    save(partial) {
-      updateAppData(partial);
-      this.timerData = { ...(this.timerData || {}), ...(partial.timerData || {}) };
-      this.workoutData = { ...(this.workoutData || {}), ...(partial.workoutData || {}) };
-      this.stepHistory = { ...(this.stepHistory || {}), ...(partial.stepsHistory || {}) };
-      this.workoutHistory = { ...(this.workoutHistory || {}), ...(partial.workoutHistory || {}) };
-      this.timeHistory = { ...(this.timeHistory || {}), ...(partial.timeHistory || {}) };
-      if (typeof partial.steps === 'numbers') this.steps = partial.steps;
-      if (typeof partial.completedCount === 'number') this.completedCount = partial.completedCount;
-    },
-    incrementWorkout(dataISO) {
-      this.workoutHistory[dataISO] = (this.workoutHistory[dataISO] || 0) + 1;
-      this.completedCount += 1;
-      this.save({ workoutData: this.timeHistory, completedCount: this.completedCount });
-    },
+import { ref, computed, onMounted } from 'vue';
+import { workoutProgram } from './utils';
+import { removeAppdata } from './service/storage';
+import { useAppStore } from '@/stores/app';
 
-    addSteps(dataISO, delta) {
-      this.steps = (this.steps || 0) + delta;
-      this.stepHistory[dataISO] = (this.stepHistory || 0) + delta;
-      this.save({ steps: this.steps, stepsHistory: this.stepHistory });
-    },
-    upsertTimer(key,seconds) { 
-        const h = Math.floor(seconds / 3600);
-        const  m = Math.floor((seconds % 3600) / 60 )
-        this.timerData[key] = {time : seconds , hour : h, minute : m};
-        this.save({timerData: this.timerData})
-    },
-    resetAll(){
-        this.timerData = {};
-        this.workoutData= {};
-        this.steps = 0;
-        this.completedCount = 0;
-        this.stepHistory = {};
-        this.workoutData = {};
-        this.timeHistory = {};
-        this.save({});
-    }
-  },
-});
+const store = useAppStore();
 
-const defaultData = {};
-for (let workoutIdx in workoutProgram) {
-  const index = Number(workoutIdx);
-  const plan = workoutProgram[workoutIdx];
-
-  if (plan && Array.isArray(plan.workout)) {
-    defaultData[index] = plan.workout.map((exercise) => ({
-      name: exercise.name,
-      sets: '',
-      reps: '',
-      weight: '',
-    }));
-  } else {
-    defaultData[index] = [];
-  }
-}
 const selectedDisplay = ref(1);
+const selectedWorkout = ref(-1);
 
-const selectedWorkout = ref(-1); // Example selected workout
+// build defaultData once from program
+const defaultData = {};
+for (const i in workoutProgram) {
+  const plan = workoutProgram[i];
+  defaultData[i] = Array.isArray(plan?.workout)
+    ? plan.workout.map((ex) => ({ name: ex.name, sets: '', reps: '', weight: '' }))
+    : [];
+}
 
-const appData = reactive({
-  timerData: {},
-  workoutData: defaultData,
-  steps: 0,
-  completedCount: 0,
-  stepHistory: { type: Object, default: () => ({}) },
-  workoutHistory: { type: Object, default: () => ({}) },
-  timeHistory: { type: Object, default: () => ({}) },
-});
+function mergeDefaults(existing, defaults) {
+  const out = {};
+  for (const k in defaults) out[k] = Array.isArray(existing?.[k]) ? existing[k] : defaults[k];
+  return out;
+}
+
 onMounted(() => {
-  // only enter the if block if we find some data saved to the key workouts in localstroage database
-  const store = loadAppData() || {};
-  const loadedData = store.workoutData || {};
-
-  // Ensure every workout index exists by merging defaults
-  const mergedData = {};
-  for (const idx in defaultData) {
-    const loaded = loadedData[idx];
-
-    if (Array.isArray(loaded)) {
-      mergedData[idx] = loaded;
-    } else {
-      // Fallback ONLY if nothing valid is saved
-      mergedData[idx] = defaultData[idx];
-    }
+  store.init();
+  if (!store.workoutData || Object.keys(store.workoutData).length === 0) {
+    store.save({ workoutData: mergeDefaults(store.workoutData, defaultData) });
   }
-  appData.timerData = store?.timerData || {};
-  appData.steps = store?.steps || 0;
-  appData.workoutData = mergedData;
-
-  const hasSaved = Object.keys(store).length > 0;
-  selectedDisplay.value = hasSaved ? 2 : 1;
+  const hasAny =
+    store.completedCount > 0 || store.steps > 0 || Object.keys(store.timerData || {}).length > 0;
+  selectedDisplay.value = hasAny ? 2 : 1;
 });
 
 const isWorkoutComplete = computed(() => {
-  const curr = appData.workoutData[selectedWorkout.value];
+  const curr = store.workoutData?.[selectedWorkout.value];
   if (!Array.isArray(curr)) return false;
-
-  return curr.every((ex) => {
-    return (
-      String(ex.sets).trim() !== '' &&
-      String(ex.reps).trim() !== '' &&
-      String(ex.weight).trim() !== ''
-    );
-  });
+  return curr.every(
+    (ex) =>
+      String(ex.sets || '').trim() !== '' &&
+      String(ex.reps || '').trim() !== '' &&
+      String(ex.weight || '').trim() !== ''
+  );
 });
+
 const firstInCompletedWorkoutIndex = computed(() => {
-  for (const [idx, workoutObj] of Object.entries(appData.workoutData)) {
-    if (!Array.isArray(workoutObj)) continue;
-
-    const allFilled = workoutObj.every(
+  const wd = store.workoutData || {};
+  for (const [idx, arr] of Object.entries(wd)) {
+    if (!Array.isArray(arr)) continue;
+    const allFilled = arr.every(
       (ex) =>
-        String(ex.sets).trim() !== '' &&
-        String(ex.reps).trim() !== '' &&
-        String(ex.weight).trim() !== ''
+        String(ex.sets || '').trim() !== '' &&
+        String(ex.reps || '').trim() !== '' &&
+        String(ex.weight || '').trim() !== ''
     );
-
     if (!allFilled) return parseInt(idx);
   }
   return -1;
 });
 
+// nav
 function handleChangeDisplay(idx) {
-  console.log('switching page', idx);
   selectedDisplay.value = idx;
 }
-
 function handleSelectWorkout(idx) {
-  console.log('Selected workout:', idx);
-
-  selectedDisplay.value = 3; // Switch to Workout display
   selectedWorkout.value = idx;
-  console.log('Selected workout index:', selectedWorkout.value);
+  selectedDisplay.value = 3;
 }
 
-// save the current date in ISO format
-const today = formatISO(new Date(), { representation: 'date' });
-const data = loadAppData();
+const todayISO = () => new Date().toISOString().slice(0, 10);
 
+// actions (call the store; no direct localStorage)
 function handleRestPlan() {
-  removeAppdata();
-  appData.workoutData = defaultData; // Reset workout data
-  appData.timerData = {};
-  appData.steps = 0; // Reset steps
-  appData.completedCount = 0; // Reset completed count
-  selectedDisplay.value = 1; // Switch back to Welcome display
-  window.location.reload(); // Reload the page to reset the state
+  removeAppdata(); // clears raw storage
+  store.resetAll(); // clears store + persists
+  store.save({ workoutData: mergeDefaults({}, defaultData) });
+  selectedWorkout.value = -1;
+  selectedDisplay.value = 1;
 }
 
 function handleSaveWorkout(value) {
-  console.log('Saving workout data:', value);
-  const workoutHistory = { ...(data.workoutHistory || {}) };
-  console.log(workoutHistory, 'yeshistroy');
-
-  workoutHistory[today] = (workoutHistory[today] || 0) + 1;
-  appData.workoutHistory = workoutHistory;
-  console.log(workoutHistory, '2rd');
-  appData.workoutData[selectedWorkout.value] = value;
-
-  appData.completedCount++;
-
-  //localStorage.setItem('workoutData', JSON.stringify(data.value));
-  updateAppData({
-    workoutData: appData.workoutData,
-    completedCount: appData.completedCount,
-    workoutHistory,
-  });
-  console.log((selectedDisplay.value = 2), 'swiching pages');
-  selectedDisplay.value = 2; // Switch back to Dashboard display
-
-  selectedWorkout.value = -1; // Reset selected workout
+  const wk = selectedWorkout.value;
+  const merged = { ...(store.workoutData || {}) };
+  merged[wk] = value;
+  store.save({ workoutData: merged });
+  store.incrementWorkout(todayISO());
+  selectedWorkout.value = -1;
+  selectedDisplay.value = 2;
 }
 
-function handleSaveTimerData(value) {
-  // Clone & accumulate into today’s bucket
-  const timerHistory = { ...data.timeHistory };
-  timerHistory[today] = (timerHistory[today] || 0) + value;
+function handleSaveTimerData(payload) {
+  let seconds = 0;
+  let key = selectedWorkout.value;
 
-  // (Optionally prune old dates here…)
+  if (typeof payload === 'number') seconds = payload;
+  else if (payload && typeof payload === 'object') {
+    seconds = payload.seconds ?? payload.time ?? 0;
+    key = payload.key ?? key;
+  }
+  if (key == null || key < 0 || seconds <= 0) return;
 
-  // Update both the raw timerData and the historical log
-  appData.timerData = value;
-  appData.timeHistory = timerHistory;
-
-  updateAppData({
-    timerData: appData.timerData,
-    timeHistory: timerHistory || {},
-  });
+  store.upsertTimer(key, seconds);
+  const th = { ...(store.timeHistory || {}) };
+  th[todayISO()] = (th[todayISO()] || 0) + seconds;
+  store.save({ timeHistory: th });
 }
 
-function handleSaveSteps(value) {
-  const stepsHistory = { ...(data.stepHistory || {}) };
-  stepsHistory[today] = (stepsHistory[today] || 0) + value;
-
-  appData.steps = value;
-  appData.stepHistory = stepsHistory;
-  updateAppData({
-    steps: appData.steps,
-    stepHistory: stepsHistory,
-  });
+function handleSaveSteps(delta) {
+  store.addSteps(todayISO(), delta);
 }
 
 function handleAddWorkout(value) {
-  console.log('Saving workout data:', value);
-  const workoutHistory = { ...(data.workoutHistory || {}) };
-  console.log(workoutHistory, 'yeshistroy');
-
-  workoutHistory[today] = (workoutHistory[today] || 0) + 1;
-  appData.workoutHistory = workoutHistory;
-  console.log(workoutHistory, '2rd');
-  appData.workoutData[selectedWorkout.value].push({
-    name: value.name,
-    sets: value.sets,
-    reps: value.reps,
-    weight: value.weight,
-  });
-
-  updateAppData({
-    workoutData: appData.workoutData,
-
-    workoutHistory,
-  });
+  const wk = selectedWorkout.value;
+  const arr = Array.isArray(store.workoutData?.[wk]) ? [...store.workoutData[wk]] : [];
+  arr.push({ name: value.name, sets: value.sets, reps: value.reps, weight: value.weight });
+  const merged = { ...(store.workoutData || {}) };
+  merged[wk] = arr;
+  store.save({ workoutData: merged });
 }
 
 function handleDeleteExercise(exerciseIndex) {
-  const workoutIndex = selectedWorkout.value;
-  const currentExercises = appData.workoutData[workoutIndex];
-
-  if (!currentExercises || !currentExercises.length) return;
-
-  appData.workoutData[workoutIndex].splice(exerciseIndex, 1);
-
-  updateAppData({
-    workoutData: appData.workoutData,
-    workoutHistory: appData.workoutHistory,
-  });
+  const wk = selectedWorkout.value;
+  const arr = Array.isArray(store.workoutData?.[wk]) ? [...store.workoutData[wk]] : [];
+  arr.splice(exerciseIndex, 1);
+  const merged = { ...(store.workoutData || {}) };
+  merged[wk] = arr;
+  store.save({ workoutData: merged });
 }
 
 function handleReorderWorkout(updatedList) {
-  console.log(updatedList, 'yes');
-  appData.workoutData[selectedWorkout.value] = updatedList;
-
-  updateAppData({
-    workoutData: appData.workoutData,
-    workoutHistory: appData.workoutHistory,
-    completedCount: appData.completedCount,
-  });
+  const wk = selectedWorkout.value;
+  const merged = { ...(store.workoutData || {}) };
+  merged[wk] = updatedList;
+  store.save({ workoutData: merged });
 }
 </script>
 
 <template>
-  <Layouts
-    :appData="appData"
-    :selectedDisplay="selectedDisplay"
-    :handleChangeDisplay="handleChangeDisplay"
-  >
+  <Layouts :selectedDisplay="selectedDisplay" :handleChangeDisplay="handleChangeDisplay">
     <Welcome :handleChangeDisplay="handleChangeDisplay" v-if="selectedDisplay == 1" />
-    <!-- The Welcome component will be displayed first -->
+
     <Dashboard
       :handleRestPlan="handleRestPlan"
       :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
       :handleSelectWorkout="handleSelectWorkout"
       v-if="selectedDisplay == 2"
     />
-    <!-- The Dashboard component will be displayed after the Welcome component -->
+
     <Workout
       :handleReorderWorkout="handleReorderWorkout"
       :handleDeleteExercise="handleDeleteExercise"
       :handleAddWorkout="handleAddWorkout"
-      :timerData="appData.timerData"
-      :steps="appData.steps"
-      :workoutData="appData.workoutData"
+      :timerData="store.timerData"
+      :steps="store.steps"
+      :workoutData="store.workoutData"
       :handleSaveSteps="handleSaveSteps"
       :handleSaveTimerData="handleSaveTimerData"
       :isWorkoutComplete="isWorkoutComplete"
@@ -316,14 +169,13 @@ function handleReorderWorkout(updatedList) {
       v-if="selectedDisplay === 3 && selectedWorkout >= 0"
       @finishWorkout="selectedDisplay = 2"
     />
-    <!-- The Workout component will be displayed after the Dashboard component -->
 
     <LeaderBoard
       :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
       :selectedWorkout="selectedWorkout"
-      :steps="appData.steps"
-      :timerData="appData.timerData"
-      :workoutData="appData.workoutData"
+      :steps="store.steps"
+      :timerData="store.timerData"
+      :workoutData="store.workoutData"
       v-if="selectedDisplay === 4"
     />
   </Layouts>
