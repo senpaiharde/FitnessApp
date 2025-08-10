@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch, reactive, toRef } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 import draggable from 'vuedraggable';
-import draggableComponent from 'vuedraggable';
+
 import Warmup from '../sideComponents/Warmup.vue';
 import Timer from '../sideComponents/Timer.vue';
 const props = defineProps({
@@ -33,10 +33,8 @@ const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise
 
 const reactiveData = toRef(props, 'workoutData');
 const data = computed(() => reactiveData.value);
-console.log(data.value, 'data', props, 'while props');
-onMounted(() => {
-  console.log('Mounted workout, preloaded values:', data.value[props.selectedWorkout]);
 
+onMounted(() => {
   for (const key in workout.value) {
     console.log(workout.value[key], workout.value[key], workout.value[key].sets);
 
@@ -55,33 +53,46 @@ const values = reactive({
 
 const EditAndAddForm = ref(false);
 const ButtonsReady = ref(false);
-console.log(ButtonsReady.value, 'here');
-setTimeout(() => {
-  ButtonsReady.value = true;
-  console.log(ButtonsReady.value, 'here');
-}, 2500);
-function handleSaveNewWorkout(value) {
+
+function addExercise(value) {
+  if (!values.value.name.trim()) return;
   props.handleAddWorkout({ ...value });
   EditAndAddForm.value = false;
   ButtonsReady.value = false;
   setTimeout(() => {
     ButtonsReady.value = true;
   }, 1500);
-  values.name = '';
-  values.sets = '';
-  values.reps = '';
-  values.weight = '';
+  values.value = { name: '', sets: '', reps: '', weight: '' };
 }
-console.log(workout.value, 'workout');
-const handleSkip = () => {
-    console.log('fireing')
-  workout.value.forEach((exercise) => {
-    exercise.sets = '1';
-    exercise.reps = '1';
-    exercise.weight = '1';
+
+function onDelete(index) {
+  props.handleDeleteExercise?.(index);
+}
+
+function onReorder() {
+ 
+  props.handleReorderWorkout?.(workout.value);
+}
+
+function saveAndExit() {
+  props.handleSaveWorkout?.(workout.value);
+}
+
+function completeWorkout() {
+  if (!props.isWorkoutComplete) return;
+  props.handleSaveWorkout?.(workout.value);
+}
+
+// optional: quick-fill everything with 1s then save
+function handleSkip() {
+  const arr = workout.value;
+  arr.forEach((ex) => {
+    ex.sets = ex.sets || '1';
+    ex.reps = ex.reps || '1';
+    ex.weight = ex.weight || '1';
   });
-  props.handleSaveWorkout(workout.value);
-};
+  props.handleSaveWorkout?.(arr);
+}
 </script>
 
 <template>
@@ -105,7 +116,7 @@ const handleSkip = () => {
 
     <section id="workout-card">
       <Timer
-         :handleSkip="handleSkip"
+        :handleSkip="handleSkip"
         :handleReorderWorkout="props.handleReorderWorkout"
         :handleDeleteExercise="props.handleDeleteExercise"
         :handleAddWorkout="props.handleAddWorkout"
@@ -137,7 +148,7 @@ const handleSkip = () => {
         </h6>
         <transition name="slide-fade">
           <form
-            @submit.prevent="handleSaveNewWorkout(values)"
+            @submit.prevent="addExercise(values)"
             class="workout-grid-row"
             v-if="EditAndAddForm"
           >
@@ -152,7 +163,7 @@ const handleSkip = () => {
         </transition>
       </div>
       <draggable
-        @update="() => props.handleReorderWorkout(workout)"
+        @update="() => onReorder(workout)"
         v-model="workout"
         :item-key="(item, index) => item?.name || index"
         ghost-class="drag-ghost"
@@ -165,7 +176,7 @@ const handleSkip = () => {
         <template #item="{ element, index }">
           <div class="workout-grid-row drag-handle cursor-grab">
             <div class="grid-name">
-              <button v-if="EditAndAddForm" @click="() => props.handleDeleteExercise(index)">
+              <button v-if="EditAndAddForm" @click="() => onDelete(index)">
                 <i class="fa-solid fa-trash"></i>
               </button>
               <p>{{ element.name }}</p>
@@ -193,14 +204,11 @@ const handleSkip = () => {
             <i class="fa-solid fa-save"></i>
           </span>
         </button>
-        <button @click="() => props.handleSaveWorkout(workout)">
+        <button @click="() => saveAndExit(workout)">
           Save & Exit
           <i class="fa-solid fa-save"></i>
         </button>
-        <button
-          :disabled="!props.isWorkoutComplete"
-          @click="() => props.handleSaveWorkout(workout)"
-        >
+        <button :disabled="!props.isWorkoutComplete" @click="() => saveAndExit(workout)">
           Complete
           <i class="fa-solid fa-check"></i>
         </button>
@@ -334,5 +342,4 @@ const handleSkip = () => {
 .workout-btns button i {
   padding-left: 0.5rem;
 }
-
 </style>

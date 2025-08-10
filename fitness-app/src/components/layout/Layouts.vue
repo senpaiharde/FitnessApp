@@ -1,21 +1,12 @@
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUp,
-  useClerk,
-  UserButton,
-  useUser,
-  SignOutButton,
-} from '@clerk/vue';
+import { SignedIn, SignedOut, SignInButton, UserButton, SignOutButton } from '@clerk/vue';
 import { useAppStore } from '../../utils/app';
 
 const props = defineProps({
   handleRestPlan: Function,
   firstInCompletedWorkoutIndex: Number,
-  handleSelectWorkout: Function,
+  handleSelectWorkout: Number,
 });
 const store = useAppStore;
 const hasSaved = computed(() => {
@@ -95,6 +86,12 @@ function leave(el, done) {
 
   setTimeout(done, duration);
 }
+function goDashboard() {
+  props.handleChangeDisplay?.(4);
+} // 2 = Dashboard
+function goWorkout() {
+  props.handleChangeDisplay?.(2);
+} // 3 = Workout
 </script>
 
 <template>
@@ -114,8 +111,8 @@ function leave(el, done) {
         </SignedIn>
       </div>
       <div>
-        <button @click="() => handleChangeDisplay(4)">Dashboard</button>
-        <button @click="() => handleChangeDisplay(2)" class="HeaderButton">Workout</button>
+        <button @click="goDashboard">Dashboard</button>
+        <button @click="goWorkout" class="HeaderButton">Workout</button>
       </div>
     </div>
   </header>
