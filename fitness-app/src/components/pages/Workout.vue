@@ -83,7 +83,7 @@ function completeWorkout() {
   props.handleSaveWorkout?.(workout.value);
 }
 
-// optional: quick-fill everything with 1s then save
+
 function handleSkip() {
   const arr = workout.value;
   arr.forEach((ex) => {
