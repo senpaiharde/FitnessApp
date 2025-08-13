@@ -70,7 +70,6 @@ function onDelete(index) {
 }
 
 function onReorder() {
- 
   props.handleReorderWorkout?.(workout.value);
 }
 
@@ -82,7 +81,6 @@ function completeWorkout() {
   if (!props.isWorkoutComplete) return;
   props.handleSaveWorkout?.(workout.value);
 }
-
 
 function handleSkip() {
   const arr = workout.value;
@@ -231,7 +229,7 @@ function handleSkip() {
 }
 .slide-fade-enter-to,
 .slide-fade-leave-from {
-  max-height: 500px; /* Enough height to fully show the form */
+  max-height: 500px; 
   opacity: 1;
 }
 @media screen and (max-width: 500px) {
