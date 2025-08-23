@@ -26,7 +26,7 @@ watch(
   () => props.selectedDisplay,
   (newPage) => {
     if (hasSaved.value && newPage !== 1) {
-      // only animate for pages 2–4
+      // only animate for pages 2–4 1
 
       const leaveDuration = 200;
       activePage.value = null; // triggers leave animation

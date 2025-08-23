@@ -51,6 +51,9 @@ const workoutDisplay = WorkoutDataDisplay({
   completedCount: props.completedCount,
 });
 
+
+
+
 const topUsers = ref([]);
 
 const board = buildLeaderboard(user, 10);

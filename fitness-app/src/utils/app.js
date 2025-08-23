@@ -54,7 +54,11 @@ export const useAppStore = defineProps('app', {
       const m = Math.floor((s % 3600) / 60);
       this.timerData[key] = { time: s, hour: h, minute: m };
       this.save({ timerData: this.timerData });
+    
     },
+     
+   
+
     resetAll() {
       this.timerData = {};
       this.workoutData = {};
