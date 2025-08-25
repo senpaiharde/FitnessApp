@@ -8,7 +8,7 @@ const props = defineProps({
   firstInCompletedWorkoutIndex: Number,
   handleSelectWorkout: Number,
 });
-const store = useAppStore;
+const store = useAppStore();
 const hasSaved = computed(() => {
   return Object.keys(props.appData.workoutData).length > 0;
 });
