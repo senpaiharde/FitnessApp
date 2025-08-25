@@ -3,23 +3,20 @@ import { computed, onMounted, ref, watch, reactive, toRef } from 'vue';
 import { workoutProgram, exerciseDescriptions } from '../../utils';
 import Portal from '../Portal.vue';
 import draggable from 'vuedraggable';
-
+import { useAppStore } from '../../utils/app';
 import Warmup from '../sideComponents/Warmup.vue';
 import Timer from '../sideComponents/Timer.vue';
 const props = defineProps({
+
   handleReorderWorkout: Function,
   handleDeleteExercise: Function,
   handleAddWorkout: Function,
-  handleSaveSteps: Function,
-  handleSaveTimerData: Function,
-  timerData: Object,
-  steps: Number,
   workoutData: Object,
   selectedWorkout: Number,
   isWorkoutComplete: Boolean,
   handleSaveWorkout: Function,
 });
-
+const store = useAppStore();
 const workout = computed({
   get: () => props.workoutData?.[props.selectedWorkout] || [],
   set: (newValue) => {
@@ -125,8 +122,7 @@ function handleSkip() {
         :handleSaveTimerData="props.handleSaveTimerData"
         :isWorkoutComplete="props.isWorkoutComplete"
         :handleSaveWorkout="props.handleSaveWorkout"
-        :selectedWorkout="props.selectedWorkout"
-      />
+        :selectedWorkout="props.selectedWorkout" />
       <div class="workout-grid">
         <h4 class="grid-name">Warmup</h4>
         <h6>sets</h6>
@@ -148,8 +144,7 @@ function handleSkip() {
           <form
             @submit.prevent="addExercise(values)"
             class="workout-grid-row"
-            v-if="EditAndAddForm"
-          >
+            v-if="EditAndAddForm">
             <div class="grid-name">
               <button type="submit" class="submit-btn">Add</button>
               <input v-model="values.name" placeholder="Exercise Name" required />
@@ -169,8 +164,7 @@ function handleSkip() {
         animation="200"
         :tag="'div'"
         :item-tag="'div'"
-        class="workout-grid"
-      >
+        class="workout-grid">
         <template #item="{ element, index }">
           <div class="workout-grid-row drag-handle cursor-grab">
             <div class="grid-name">
@@ -229,7 +223,7 @@ function handleSkip() {
 }
 .slide-fade-enter-to,
 .slide-fade-leave-from {
-  max-height: 500px; 
+  max-height: 500px;
   opacity: 1;
 }
 @media screen and (max-width: 500px) {

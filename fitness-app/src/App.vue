@@ -150,33 +150,20 @@ function handleReorderWorkout(updatedList) {
       :handleRestPlan="handleRestPlan"
       :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
       :handleSelectWorkout="handleSelectWorkout"
-      v-if="selectedDisplay == 2"
-    />
+      v-if="selectedDisplay == 2" />
 
     <Workout
-      :handleReorderWorkout="handleReorderWorkout"
-      :handleDeleteExercise="handleDeleteExercise"
-      :handleAddWorkout="handleAddWorkout"
-      :timerData="store.timerData"
-      :steps="store.steps"
       :workoutData="store.workoutData"
-      :handleSaveSteps="handleSaveSteps"
-      :handleSaveTimerData="handleSaveTimerData"
+      :selectedWorkout="selectedWorkout"
       :isWorkoutComplete="isWorkoutComplete"
       :handleSaveWorkout="handleSaveWorkout"
-      :selectedWorkout="selectedWorkout"
       v-if="selectedDisplay === 3 && selectedWorkout >= 0"
-      @finishWorkout="selectedDisplay = 2"
-    />
+      @finishWorkout="selectedDisplay = 2" />
 
     <LeaderBoard
-      :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
-      :selectedWorkout="selectedWorkout"
-      :steps="store.steps"
-      :timerData="store.timerData"
-      :workoutData="store.workoutData"
-      v-if="selectedDisplay === 4"
-    />
+    :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
+    :selectedWorkout="selectedWorkout"
+      v-if="selectedDisplay === 4" />
   </Layouts>
 </template>
 
