@@ -1,20 +1,18 @@
 <script setup>
 import Portal from '../Portal.vue';
 import { computed, onMounted, ref, watch, reactive, toRef } from 'vue';
+
+ import { useAppStore } from '../../utils/app';
+ const store = useAppStore();
 const props = defineProps({
   handleSkip: Function,
-  handleReorderWorkout: Function,
-  handleDeleteExercise: Function,
-  handleAddWorkout: Function,
-  handleSaveSteps: Function,
-  handleSaveTimerData: Function,
-  timerData: Object,
-  steps: Number,
-  workoutData: Object,
-  selectedWorkout: Number,
-  isWorkoutComplete: Boolean,
-  handleSaveWorkout: Function,
-});
+   handleReorderWorkout: Function,
+   handleDeleteExercise: Function,
+   handleAddWorkout: Function,
+   workoutData: Object,
+   selectedWorkout: Number,
+   isWorkoutComplete: Boolean,
+ })
 console.log(props, 'data');
 const workoutTypes = ['push', 'pull', 'legs'];
 const day = props.selectedWorkout + 1;

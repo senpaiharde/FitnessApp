@@ -7,7 +7,6 @@ import { useAppStore } from '../../utils/app';
 import Warmup from '../sideComponents/Warmup.vue';
 import Timer from '../sideComponents/Timer.vue';
 const props = defineProps({
-
   handleReorderWorkout: Function,
   handleDeleteExercise: Function,
   handleAddWorkout: Function,
@@ -52,14 +51,17 @@ const EditAndAddForm = ref(false);
 const ButtonsReady = ref(false);
 
 function addExercise(value) {
-  if (!values.value.name.trim()) return;
+  if (!values.name.trim()) return;
   props.handleAddWorkout({ ...value });
   EditAndAddForm.value = false;
   ButtonsReady.value = false;
   setTimeout(() => {
     ButtonsReady.value = true;
   }, 1500);
-  values.value = { name: '', sets: '', reps: '', weight: '' };
+  values.name = '';
+  values.sets = '';
+  values.reps = '';
+  values.weight = '';
 }
 
 function onDelete(index) {
@@ -115,11 +117,7 @@ function handleSkip() {
         :handleReorderWorkout="props.handleReorderWorkout"
         :handleDeleteExercise="props.handleDeleteExercise"
         :handleAddWorkout="props.handleAddWorkout"
-        :timerData="props.timerData"
-        :steps="props.steps"
         :workoutData="props.workoutData"
-        :handleSaveSteps="props.handleSaveSteps"
-        :handleSaveTimerData="props.handleSaveTimerData"
         :isWorkoutComplete="props.isWorkoutComplete"
         :handleSaveWorkout="props.handleSaveWorkout"
         :selectedWorkout="props.selectedWorkout" />
@@ -136,7 +134,7 @@ function handleSkip() {
         <h6>reps</h6>
         <h6 class="grid-weights">
           weights
-          <button class="add-exercise-btn" @click="() => props.handleAddExercise()">
+          <button class="add-exercise-btn" @click="EditAndAddForm = !EditAndAddForm">
             <i class="fa-regular fa-circle-question"></i>
           </button>
         </h6>
@@ -156,7 +154,7 @@ function handleSkip() {
         </transition>
       </div>
       <draggable
-        @update="() => onReorder(workout)"
+        @update="onReorder"
         v-model="workout"
         :item-key="(item, index) => item?.name || index"
         ghost-class="drag-ghost"
