@@ -14,12 +14,11 @@ import { loadAllAppData, setSignedInUser } from '../../service/storage';
 import DataPicker from '../../service/DataPicker.vue';
 import { buildLeaderboard, enter, leave, WorkoutDataDisplay } from '../../utils/code';
 import { OptionsOfRange, OptionsOfRangeInDays } from '../../utils/options';
+import { useAppStore } from '../../utils/app';
 
+const store = useAppStore();
 const props = defineProps({
   selectedWorkout: Number,
-  steps: Number,
-  timerData: Object,
-  workoutData: Object,
   firstInCompletedWorkoutIndex: Number,
 });
 
@@ -31,34 +30,27 @@ const toggleStats = () => {
 const showStats = ref(true);
 
 watch(
-  () => user['value']?.id,
+  () => user.value?.id,
   (newId, oldId) => {
-    console.log('User ID changed:', oldId, '→', newId);
-    if (newId) {
-      setSignedInUser(newId);
-    } else {
-      setSignedInUser(null);
-    }
+    if (newId) setSignedInUser(newId);
+    else setSignedInUser(null);
   },
   { immediate: true }
 );
 
-const workoutDisplay = WorkoutDataDisplay({
-  workoutData: props.workoutData,
-  firstInCompletedWorkoutIndex: props.firstInCompletedWorkoutIndex,
-  timerData: props.timerData,
-  steps: props.steps,
-  completedCount: props.completedCount,
-});
-
-
-
+const workoutDisplay = computed(() =>
+  WorkoutDataDisplay({
+    workoutData: store.workoutData,
+    firstInCompletedWorkoutIndex: props.firstInCompletedWorkoutIndex,
+    timerData: store.timerData,
+    steps: store.steps,
+    completedCount: store.completedCount,
+  })
+);
 
 const topUsers = ref([]);
-
+const selectedRange = ref(30);
 const board = buildLeaderboard(user, 10);
-console.log('board', board);
-console.log('topUsers', topUsers.value);
 
 watch(
   () => user.value?.id,
@@ -71,17 +63,13 @@ watch(
   { immediate: true }
 );
 
-const selectedRange = ref(30);
-
 watch(
   selectedRange,
   (newRange) => {
-    console.log('Selected range changed:', newRange);
     topUsers.value = buildLeaderboard(user, newRange);
   },
   { immediate: true }
 );
-
 console.log('selectedRange', selectedRange.value);
 
 const selectedMetric = ref('all');
