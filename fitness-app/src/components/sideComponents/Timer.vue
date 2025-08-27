@@ -2,17 +2,17 @@
 import Portal from '../Portal.vue';
 import { computed, onMounted, ref, watch, reactive, toRef } from 'vue';
 
- import { useAppStore } from '../../utils/app';
- const store = useAppStore();
+import { useAppStore } from '../../utils/app';
+const store = useAppStore();
 const props = defineProps({
   handleSkip: Function,
-   handleReorderWorkout: Function,
-   handleDeleteExercise: Function,
-   handleAddWorkout: Function,
-   workoutData: Object,
-   selectedWorkout: Number,
-   isWorkoutComplete: Boolean,
- })
+  handleReorderWorkout: Function,
+  handleDeleteExercise: Function,
+  handleAddWorkout: Function,
+  workoutData: Object,
+  selectedWorkout: Number,
+  isWorkoutComplete: Boolean,
+});
 console.log(props, 'data');
 const workoutTypes = ['push', 'pull', 'legs'];
 const day = props.selectedWorkout + 1;
@@ -22,7 +22,6 @@ let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
 let localSteps = ref(store.steps || 0);
-
 
 const reactiveData = toRef(props, 'workoutData');
 const data = computed(() => reactiveData.value);
@@ -91,7 +90,7 @@ function stopTimer() {
     timerId.value = null;
     console.log('Timer stopped');
   }
-   const seconds = hour.value * 3600 + minute.value * 60 + time.value;
+  const seconds = hour.value * 3600 + minute.value * 60 + time.value;
   store.upsertTimer(props.selectedWorkout, seconds);
 
   //localStorage.setItem('timerData', JSON.stringify(timers));
@@ -103,7 +102,8 @@ const saveSteps = () => {
     console.warn('Please enter a valid number of steps.');
     return;
   }
-  props.handleSaveSteps(localSteps.value);
+  const dateISO = new Date().toISOString().slice(0, 10);
+  store.addSteps(dateISO, delta);
 };
 
 const isEditMode = ref(false);
@@ -117,12 +117,11 @@ function saveTime() {
   hour.value = tempHour.value;
   minute.value = tempMinute.value;
   time.value = tempTime.value;
-  timers[props.selectedWorkout] = {
-    time: time.value,
-    minute: minute.value,
-    hour: hour.value,
-  };
-  props.handleSaveTimerData(timers);
+  const seconds = hour.value * 3600 + minute.value * 60 + time.value;
+
+  store.upsertTimer(props.selectedWorkout, seconds);
+
+  EditTime.value = false;
 
   EditTime.value = false;
 }
@@ -155,7 +154,7 @@ function clamp(value, min, max) {
         </p>
 
         <div class="exercise-btns">
-          <button @click="() => ((stepsPortal = null), saveSteps, console.log(saveSteps, 'steps'))">
+            <button @click="() => { saveSteps(); stepsPortal = null; }">
             Close
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -191,20 +190,17 @@ function clamp(value, min, max) {
           <input
             :value="tempHour"
             @input="tempHour = clamp($event.target.value, 0, 99)"
-            type="number"
-          />
+            type="number" />
           <span>:</span>
           <input
             :value="tempMinute"
             @input="tempMinute = clamp($event.target.value, 0, 59)"
-            type="number"
-          />
+            type="number" />
           <span>:</span>
           <input
             :value="tempTime"
             @input="tempTime = clamp($event.target.value, 0, 59)"
-            type="number"
-          />
+            type="number" />
 
           <button @click="saveTime" class="save-btn">
             <i class="fa-solid fa-check"></i>
@@ -225,8 +221,7 @@ function clamp(value, min, max) {
         () => {
           stepsPortal = true;
         }
-      "
-    >
+      ">
       {{ workoutTypes[props.selectedWorkout % 3] === 'legs' ? 'Steps Time?' : '' }}
     </button>
   </div>
