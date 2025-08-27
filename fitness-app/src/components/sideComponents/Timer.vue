@@ -16,12 +16,12 @@ const props = defineProps({
 console.log(props, 'data');
 const workoutTypes = ['push', 'pull', 'legs'];
 const day = props.selectedWorkout + 1;
-let timers = reactive({ ...props.timerData } || {});
+const timers = store.timerData;
 let time = ref(0);
 let minute = ref(0);
 let hour = ref(0);
 let timerId = ref(null);
-let localSteps = ref(props.steps || 0);
+let localSteps = ref(store.steps || 0);
 
 
 const reactiveData = toRef(props, 'workoutData');
@@ -91,12 +91,8 @@ function stopTimer() {
     timerId.value = null;
     console.log('Timer stopped');
   }
-  timers[props.selectedWorkout] = {
-    time: time.value,
-    minute: minute.value,
-    hour: hour.value,
-  };
-  props.handleSaveTimerData(timers);
+   const seconds = hour.value * 3600 + minute.value * 60 + time.value;
+  store.upsertTimer(props.selectedWorkout, seconds);
 
   //localStorage.setItem('timerData', JSON.stringify(timers));
 }
