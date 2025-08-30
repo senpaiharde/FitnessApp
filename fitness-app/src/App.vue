@@ -12,7 +12,10 @@ import { useAppStore } from './utils/app';
 
 const store = useAppStore();
 const selectedDisplay = ref(1);
-const selectedWorkout = ref(-1);
+const selectedWorkout = computed({
+  get: () => store.selectedWorkout,
+  set: (v) => store.selectWorkout(v),
+});
 
 // build defaultData once from program
 const defaultData = {};
@@ -161,8 +164,8 @@ function handleReorderWorkout(updatedList) {
       @finishWorkout="selectedDisplay = 2" />
 
     <LeaderBoard
-    :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
-    :selectedWorkout="selectedWorkout"
+      :firstInCompletedWorkoutIndex="firstInCompletedWorkoutIndex"
+      :selectedWorkout="selectedWorkout"
       v-if="selectedDisplay === 4" />
   </Layouts>
 </template>

@@ -3,12 +3,13 @@ import { computed, ref } from 'vue';
 
 import Grid from '../Grid.vue';
 import { gymHealthFacts } from '../../utils';
-
+import { useAppStore } from '../../utils/app';
 const props = defineProps({
-  handleSelectWorkout: Number,
   firstInCompletedWorkoutIndex: Number,
-  handleRestPlan: Function,
+  handleRestPlan: Function, // keep if truly needed
 });
+
+const store = useAppStore();
 
 // stable “daily tip” (same tip for the whole day)
 const facts = gymHealthFacts;
@@ -26,9 +27,7 @@ const startIndex = computed(() =>
 
 // never put inline arrows in template
 function startWorkout() {
-  if (typeof props.handleSelectWorkout === 'function') {
-    props.handleSelectWorkout(startIndex.value);
-  }
+  store.selectWorkout(startIndex.value);
 }
 </script>
 
@@ -48,8 +47,7 @@ function startWorkout() {
     <Grid
       :handle-select-workout="props.handleSelectWorkout"
       :first-in-completed-workout-index="props.firstInCompletedWorkoutIndex"
-      :handle-rest-plan="props.handleRestPlan"
-    />
+      :handle-rest-plan="props.handleRestPlan" />
   </section>
 </template>
 

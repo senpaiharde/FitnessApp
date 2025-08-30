@@ -7,22 +7,17 @@ import { useAppStore } from '../../utils/app';
 import Warmup from '../sideComponents/Warmup.vue';
 import Timer from '../sideComponents/Timer.vue';
 const props = defineProps({
-  handleReorderWorkout: Function,
-  handleDeleteExercise: Function,
-  handleAddWorkout: Function,
-  workoutData: Object,
-  selectedWorkout: Number,
-  isWorkoutComplete: Boolean,
-  handleSaveWorkout: Function,
-});
+   isWorkoutComplete: Boolean,
+   handleSaveWorkout: Function,       
+   handleReorderWorkout: Function,
+   handleDeleteExercise: Function,
+   handleAddWorkout: Function,
+ });
 const store = useAppStore();
 const workout = computed({
-  get: () => props.workoutData?.[props.selectedWorkout] || [],
-  set: (newValue) => {
-    props.workoutData[props.selectedWorkout] = newValue;
-  },
-});
-
+   get: () => store.workoutData?.[store.selectedWorkout] || [],
+   set: (newValue) => store.setWorkoutAt(store.selectedWorkout, newValue),
+ });
 let selectedExercise = ref(null);
 
 const exerciseDescription = computed(() => exerciseDescriptions[selectedExercise.value]);

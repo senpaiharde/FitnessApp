@@ -116,14 +116,14 @@ console.log(formattedTime);
 </script>
 
 <template>
-  <!-- Toggle Button -->
+  
   <div class="toggle-bar">
     <button @click="toggleStats">
       {{ showStats ? 'Hide Stats ▲' : 'Show Stats ▼' }}
     </button>
   </div>
 
-  <!-- Collapsible Stats Grid -->
+
   <transition @enter="enter" @leave="leave">
     <section ref="stateGrid" id="grid" v-show="showStats">
       <div v-for="(item, idx) in workoutDisplay" :key="idx" class="row">
