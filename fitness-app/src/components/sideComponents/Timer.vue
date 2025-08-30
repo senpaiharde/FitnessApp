@@ -32,7 +32,7 @@ onMounted(() => {
   minute.value = saved.minute || 0;
   hour.value = saved.hour || 0;
 
-  localSteps.value = props.steps || 0;
+  localSteps.value = store.steps || 0;
 });
 watch(
   () => props.selectedWorkout,
